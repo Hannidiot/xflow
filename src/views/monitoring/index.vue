@@ -42,64 +42,53 @@
       </div>
     </div>
 
-    <!-- Main Content with Splitter -->
-    <el-splitter layout="vertical" class="flex-1">
-      <!-- Virtualized Table Section -->
-      <el-splitter-panel>
-        <VxeTableBar
-          :vxeTableRef="vxeTableRef"
+    <div class="h-full flex-1">
+      <!-- Main Content with Splitter -->
+      <div class="h-3/5">
+        <vxe-grid
+          ref="vxeTableRef"
+          show-overflow
+          height="auto"
+          :column-config="{ resizable: true }"
+          :scroll-y="{ enabled: true }"
           :columns="tableColumns"
-          title="Network Traffic"
-          @refresh="handleRefresh"
-        >
-          <template #default="{ size, dynamicColumns }">
-            <vxe-grid
-              ref="vxeTableRef"
-              show-overflow
-              :height="tableHeight"
-              :size="size"
-              :column-config="{ resizable: true }"
-              :scroll-y="{ enabled: true }"
-              :columns="dynamicColumns"
-              :data="filteredData"
-            />
-          </template>
-        </VxeTableBar>
-      </el-splitter-panel>
+          :data="filteredData"
+        />
+      </div>
 
-      <el-splitter-panel>
-        <!-- Detail Panels Section -->
-        <el-splitter layout="horizontal">
-          <!-- Request Details Panel -->
-          <el-splitter-panel>
+      <div>
+        <splitpane :split-set="settingLR">
+          <template #paneL>
             <DetailPanel
               title="Request Details"
               :data="selectedRow?.request"
               :active-tab="requestActiveTab"
+              class="h-2/5"
               @tab-change="requestActiveTab = $event"
             />
-          </el-splitter-panel>
+          </template>
 
-          <!-- Response Details Panel -->
-          <el-splitter-panel>
+          <template #paneR>
             <DetailPanel
               title="Response Details"
               :data="selectedRow?.response"
               :active-tab="responseActiveTab"
+              class="h-2/5"
               @tab-change="responseActiveTab = $event"
             />
-          </el-splitter-panel>
-        </el-splitter>
-      </el-splitter-panel>
-    </el-splitter>
+          </template>
+        </splitpane>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
+import { defineComponent, ref, computed, onMounted, reactive } from "vue";
 import { Search as SearchIcon } from "@element-plus/icons-vue";
 import { VxeTableBar } from "@/components/ReVxeTableBar";
 import DetailPanel from "./components/DetailPanel.vue";
+import SplitPane, { type ContextProps } from "@/components/ReSplitPane";
 
 interface TrafficRecord {
   id: string;
@@ -126,10 +115,16 @@ export default defineComponent({
   name: "TrafficMonitoring",
   components: {
     SearchIcon,
-    VxeTableBar,
-    DetailPanel
+    DetailPanel,
+    splitpane: SplitPane
   },
   setup() {
+    // Splitter settings
+    const settingLR: ContextProps = reactive({
+      minPercent: 20,
+      defaultPercent: 50,
+      split: "vertical"
+    });
     // State
     const searchQuery = ref("");
     const selectedMethod = ref("");
@@ -279,7 +274,7 @@ export default defineComponent({
     });
 
     const tableHeight = computed(() => {
-      return window.innerHeight - 400;
+      return "calc(100% - 10px)";
     });
 
     // Methods
@@ -347,6 +342,7 @@ export default defineComponent({
       tableColumns,
       filteredData,
       tableHeight,
+      settingLR,
       handleSearch,
       handleFilterChange,
       handleCellClick,
@@ -362,23 +358,5 @@ export default defineComponent({
 <style scoped>
 .selected-row {
   border-left: 4px solid rgb(59 130 246);
-}
-
-:deep(.el-split__trigger) {
-  background-color: rgb(229 231 235);
-}
-
-:deep(.el-split__trigger:hover) {
-  background-color: rgb(209 213 219);
-}
-
-@media (prefers-color-scheme: dark) {
-  :deep(.el-split__trigger) {
-    background-color: rgb(55 65 81);
-  }
-
-  :deep(.el-split__trigger:hover) {
-    background-color: rgb(75 85 99);
-  }
 }
 </style>
