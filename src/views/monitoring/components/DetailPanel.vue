@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="h-full flex flex-col border border-gray-200 dark:border-gray-700 rounded"
-  >
+  <div class="border border-gray-200 dark:border-gray-700 rounded">
     <!-- Panel Header -->
     <div
       class="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
@@ -28,9 +26,7 @@
     <!-- Content Area -->
     <div class="flex-1 overflow-auto p-4 bg-white dark:bg-gray-900">
       <template v-if="!data">
-        <div
-          class="flex items-center justify-center h-full text-gray-500 text-sm"
-        >
+        <div class="flex items-center justify-center text-gray-500 text-sm">
           Select a record to view details
         </div>
       </template>
@@ -82,17 +78,17 @@
         </div>
 
         <!-- Raw View -->
-        <div v-else-if="activeTab === 'raw'" class="h-full">
+        <div v-else-if="activeTab === 'raw'">
           <pre
-            class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all h-full overflow-auto"
+            class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all overflow-auto"
             >{{ formatRawData(data) }}
           </pre>
         </div>
 
         <!-- Hex View -->
-        <div v-else-if="activeTab === 'hex'" class="h-full">
+        <div v-else-if="activeTab === 'hex'">
           <pre
-            class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all h-full overflow-auto"
+            class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all overflow-auto"
             >{{ formatHexData(data.body) }}
           </pre>
         </div>
