@@ -51,6 +51,7 @@ app.component("Perms", Perms);
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light.css";
 import VueTippy from "vue-tippy";
+import { useVxeTable } from "./plugins/vxeTable";
 app.use(VueTippy);
 
 getPlatformConfig(app).then(async config => {
@@ -58,7 +59,12 @@ getPlatformConfig(app).then(async config => {
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);
-  app.use(MotionPlugin).use(useI18n).use(useElementPlus).use(Table);
+  app
+    .use(MotionPlugin)
+    .use(useI18n)
+    .use(useElementPlus)
+    .use(Table)
+    .use(useVxeTable);
   // .use(PureDescriptions)
   // .use(useEcharts);
   app.mount("#app");
