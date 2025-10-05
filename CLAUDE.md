@@ -9,6 +9,7 @@ This is a Vue 3 admin dashboard template called "pure-admin-thin" - a simplified
 ## Development Commands
 
 ### Core Development
+
 - `pnpm dev` - Start development server with increased memory allocation
 - `pnpm serve` - Alias for `pnpm dev`
 - `pnpm build` - Build for production (cleans dist first)
@@ -17,6 +18,7 @@ This is a Vue 3 admin dashboard template called "pure-admin-thin" - a simplified
 - `pnpm preview:build` - Build and preview
 
 ### Code Quality
+
 - `pnpm typecheck` - Run TypeScript type checking
 - `pnpm lint` - Run all linters (ESLint, Prettier, Stylelint)
 - `pnpm lint:eslint` - ESLint only
@@ -24,12 +26,14 @@ This is a Vue 3 admin dashboard template called "pure-admin-thin" - a simplified
 - `pnpm lint:stylelint` - Stylelint only
 
 ### Maintenance
+
 - `pnpm clean:cache` - Clean cache and reinstall dependencies
 - `pnpm svgo` - Optimize SVG files
 
 ## Architecture
 
 ### Core Technologies
+
 - **Vue 3** with Composition API
 - **TypeScript** for type safety
 - **Element Plus** UI component library
@@ -58,7 +62,7 @@ src/
 
 ### Key Directories
 
-- **components/Re*** - Reusable components with Re prefix (ReIcon, ReAuth, ReDialog, etc.)
+- **components/Re\*** - Reusable components with Re prefix (ReIcon, ReAuth, ReDialog, etc.)
 - **layout/** - Main layout system with sidebar, navbar, tags, etc.
 - **store/modules/** - Pinia store modules (user, settings, permission, multiTags, etc.)
 - **build/** - Vite build configuration and plugins
@@ -66,6 +70,7 @@ src/
 ### State Management
 
 Uses Pinia with modular stores:
+
 - `user` - User authentication and profile
 - `settings` - Application settings and theme
 - `permission` - Route and permission management
@@ -75,6 +80,7 @@ Uses Pinia with modular stores:
 ### Routing
 
 Dynamic routing system with permission control:
+
 - Routes are loaded dynamically based on user permissions
 - Error routes (404, 403, 500) are pre-configured
 - Home and remaining routes are modular
@@ -89,16 +95,19 @@ Dynamic routing system with permission control:
 ## Development Notes
 
 ### TypeScript Configuration
+
 - Strict mode disabled for flexibility
 - JSX support enabled with preserve mode
 - Path aliases: `@/*` for src, `@build/*` for build
 
 ### Build Configuration
+
 - Vite with custom plugins for CDN, compression, and optimization
 - Memory allocation increased for build performance
 - Chunk size warning limit set to 4000kb
 
 ### Code Quality Tools
+
 - ESLint with Vue and TypeScript rules
 - Prettier for code formatting
 - Stylelint for CSS/SCSS
@@ -106,6 +115,7 @@ Dynamic routing system with permission control:
 - Commitlint for commit message conventions
 
 ### Package Manager
+
 - Uses pnpm exclusively (enforced via preinstall hook)
 - Node.js version: ^20.19.0 || >=22.12.0
 - pnpm version: >=9
@@ -116,3 +126,4 @@ Dynamic routing system with permission control:
 - Issues and PRs should be submitted to the full vue-pure-admin repository
 - Bundle size optimized to be under 2.3MB with Element Plus globally imported
 - Can be further optimized to under 350kb with CDN and compression
+- the project under /Users/minhao/Workspace/github-projects/vue-pure-admin is a sample project you can refer to, it contains a series of best practices in PureAdmin. Always check this repo before doing your implementations.
