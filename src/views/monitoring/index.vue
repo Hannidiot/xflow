@@ -86,7 +86,6 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, reactive } from "vue";
 import { Search as SearchIcon } from "@element-plus/icons-vue";
-import { VxeTableBar } from "@/components/ReVxeTableBar";
 import DetailPanel from "./components/DetailPanel.vue";
 import SplitPane, { type ContextProps } from "@/components/ReSplitPane";
 
