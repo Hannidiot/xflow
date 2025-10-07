@@ -1,65 +1,39 @@
 <template>
-  <div class="h-full flex flex-col">
-    <!-- Search Bar Section -->
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-      <div class="flex items-center gap-4">
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索测试数据..."
-          clearable
-          class="flex-1"
-          @input="handleSearch"
-        >
-          <template #prefix>
-            <el-icon><SearchIcon /></el-icon>
+  <div id="test" ref="testRef" class="h-dvh">
+    <ReSplitPane
+      ref="splitPaneRef"
+      :split-set="settingTB"
+      :height="sectionHeight"
+    >
+      <template #paneL>
+        <PureTableBar title="测试用例列表" :columns="tableColumns">
+          <template v-slot="{ size, dynamicColumns }">
+            <pure-table
+              row-key="id"
+              align-whole="center"
+              table-layout="auto"
+              :height="tableHeight"
+              :data="mockData"
+              :size="size"
+              :columns="dynamicColumns"
+            />
           </template>
-        </el-input>
+        </PureTableBar>
+      </template>
 
-        <el-select
-          v-model="selectedCategory"
-          placeholder="分类"
-          clearable
-          @change="handleFilterChange"
-        >
-          <el-option label="前端" value="frontend" />
-          <el-option label="后端" value="backend" />
-          <el-option label="数据库" value="database" />
-          <el-option label="测试" value="testing" />
-        </el-select>
-
-        <el-select
-          v-model="selectedStatus"
-          placeholder="状态"
-          clearable
-          @change="handleFilterChange"
-        >
-          <el-option label="成功" value="success" />
-          <el-option label="失败" value="failed" />
-          <el-option label="进行中" value="running" />
-          <el-option label="待处理" value="pending" />
-        </el-select>
-      </div>
-    </div>
-
-    <!-- Table Section -->
-    <div class="flex-1 p-4">
-      <vxe-grid
-        ref="vxeTableRef"
-        show-overflow
-        height="auto"
-        :column-config="{ resizable: true }"
-        :scroll-y="{ enabled: true }"
-        :columns="tableColumns"
-        :data="filteredData"
-        @cell-click="handleCellClick"
-      />
-    </div>
+      <template #paneR>
+        <div class="demo-panel">
+          <h2 class="text-2xl font-bold">测试用例列表面板</h2>
+        </div>
+      </template>
+    </ReSplitPane>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
-import { Search as SearchIcon } from "@element-plus/icons-vue";
+import { defineComponent, ref, onMounted, computed, reactive } from "vue";
+import { PureTableBar } from "@/components/RePureTableBar";
+import ReSplitPane, { ContextProps } from "@/components/ReSplitPane";
 
 interface TestRecord {
   id: string;
@@ -76,7 +50,8 @@ interface TestRecord {
 export default defineComponent({
   name: "TestTable",
   components: {
-    SearchIcon
+    PureTableBar,
+    ReSplitPane
   },
   setup() {
     // State
@@ -84,7 +59,13 @@ export default defineComponent({
     const selectedCategory = ref("");
     const selectedStatus = ref("");
     const selectedRow = ref<TestRecord | null>(null);
-    const vxeTableRef = ref();
+    const testRef = ref<HTMLElement | null>(null);
+    const splitPaneRef = ref<InstanceType<typeof ReSplitPane> | null>(null);
+    const settingTB: ContextProps = reactive({
+      minPercent: 35,
+      defaultPercent: 70,
+      split: "horizontal"
+    });
 
     // Mock data
     const mockData = ref<TestRecord[]>([]);
@@ -98,7 +79,7 @@ export default defineComponent({
 
       const data: TestRecord[] = [];
 
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 30; i++) {
         const category =
           categories[Math.floor(Math.random() * categories.length)];
         const status = statuses[Math.floor(Math.random() * statuses.length)];
@@ -127,80 +108,51 @@ export default defineComponent({
     // Table columns for VxeTable
     const tableColumns = ref([
       {
-        title: "ID",
-        field: "id",
+        label: "ID",
+        prop: "id",
         width: 100
       },
       {
-        title: "名称",
-        field: "name",
+        label: "名称",
+        prop: "name",
         width: 200
       },
       {
-        title: "分类",
-        field: "category",
+        label: "分类",
+        prop: "category",
         width: 120
       },
       {
-        title: "状态",
-        field: "status",
+        label: "状态",
+        prop: "status",
         width: 100
       },
       {
-        title: "优先级",
-        field: "priority",
+        label: "优先级",
+        prop: "priority",
         width: 100
       },
       {
-        title: "耗时",
-        field: "duration",
+        label: "耗时",
+        prop: "duration",
         width: 80
       },
       {
-        title: "创建时间",
-        field: "createdAt",
+        label: "创建时间",
+        prop: "createdAt",
         width: 180
       },
       {
-        title: "描述",
-        field: "description",
+        label: "描述",
+        prop: "description",
         width: 300
       },
       {
-        title: "作者",
-        field: "author",
+        label: "作者",
+        prop: "author",
         width: 100
       }
     ]);
-
-    // Computed
-    const filteredData = computed(() => {
-      let filtered = mockData.value;
-
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(
-          item =>
-            item.name.toLowerCase().includes(query) ||
-            item.description.toLowerCase().includes(query) ||
-            item.author.toLowerCase().includes(query)
-        );
-      }
-
-      if (selectedCategory.value) {
-        filtered = filtered.filter(
-          item => item.category === selectedCategory.value
-        );
-      }
-
-      if (selectedStatus.value) {
-        filtered = filtered.filter(
-          item => item.status === selectedStatus.value
-        );
-      }
-
-      return filtered;
-    });
 
     // Methods
     const handleSearch = () => {
@@ -216,6 +168,28 @@ export default defineComponent({
       console.log("Selected row:", row);
     };
 
+    const sectionHeight = computed(() => {
+      if (testRef.value) {
+        let height = 0.85 * testRef.value.clientHeight - 100; // Adjust 100px for header and padding
+        console.log("Calculated section height:", height);
+
+        return height;
+      }
+      return 600; // Default height
+    });
+
+    const tableHeight = computed(() => {
+      if (splitPaneRef.value) {
+        let height =
+          ((splitPaneRef.value.percent as number) / 100) *
+          (0.95 * testRef.value!.clientHeight - 100); // Adjust 100px for header and padding
+
+        console.log("Calculated table height:", height);
+        return height;
+      }
+      return 500;
+    });
+
     // Lifecycle
     onMounted(() => {
       mockData.value = generateMockData();
@@ -223,6 +197,7 @@ export default defineComponent({
       if (mockData.value.length > 0) {
         selectedRow.value = mockData.value[0];
       }
+      console.log("Initial testRef height:", testRef.value.clientHeight);
     });
 
     return {
@@ -230,9 +205,13 @@ export default defineComponent({
       selectedCategory,
       selectedStatus,
       selectedRow,
-      vxeTableRef,
       tableColumns,
-      filteredData,
+      settingTB,
+      sectionHeight,
+      tableHeight,
+      testRef,
+      splitPaneRef,
+      mockData,
       handleSearch,
       handleFilterChange,
       handleCellClick
@@ -244,5 +223,11 @@ export default defineComponent({
 <style scoped>
 .selected-row {
   border-left: 4px solid rgb(59 130 246);
+}
+
+.demo-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

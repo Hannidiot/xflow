@@ -25,6 +25,9 @@ export default defineComponent({
     const percent = ref(props.splitSet?.defaultPercent);
     const type = props.splitSet?.split === "vertical" ? "width" : "height";
     const resizeType = props.splitSet?.split === "vertical" ? "left" : "top";
+    ctx.expose({
+      percent
+    });
 
     const leftClass = ref([
       "splitter-pane splitter-paneL",
