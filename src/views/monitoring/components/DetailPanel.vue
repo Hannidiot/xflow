@@ -1,5 +1,7 @@
 <template>
-  <div class="border border-gray-200 dark:border-gray-700 rounded">
+  <div
+    class="flex flex-col border border-gray-200 dark:border-gray-700 rounded"
+  >
     <!-- Panel Header -->
     <div
       class="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
@@ -24,7 +26,7 @@
     </div>
 
     <!-- Content Area -->
-    <div class="flex-1 overflow-auto p-4 bg-white dark:bg-gray-900">
+    <el-scrollbar class="p-4 bg-white dark:bg-gray-900">
       <template v-if="!data">
         <div class="flex items-center justify-center text-gray-500 text-sm">
           Select a record to view details
@@ -33,7 +35,7 @@
 
       <template v-else>
         <!-- Pretty View -->
-        <div v-if="activeTab === 'pretty'" class="space-y-4">
+        <div v-if="activeTab === 'pretty'" class="space-y-2">
           <!-- Headers Section -->
           <div>
             <h4
@@ -82,7 +84,8 @@
           <pre
             class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all overflow-auto"
             >{{ formatRawData(data) }}
-          </pre>
+            </pre
+          >
         </div>
 
         <!-- Hex View -->
@@ -90,10 +93,11 @@
           <pre
             class="text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all overflow-auto"
             >{{ formatHexData(data.body) }}
-          </pre>
+            </pre
+          >
         </div>
       </template>
-    </div>
+    </el-scrollbar>
   </div>
 </template>
 

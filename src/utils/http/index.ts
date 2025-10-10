@@ -132,6 +132,12 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
+
+        const data = response.data as Response<any>;
+        if (data.code == "403") {
+          return response.data;
+        }
+
         return response.data;
       },
       (error: PureHttpError) => {
@@ -189,6 +195,12 @@ class PureHttp {
   ): Promise<T> {
     return this.request<T>("get", url, params, config);
   }
+}
+
+export interface Response<T> {
+  code: string;
+  err_msg: string;
+  data: T;
 }
 
 export const http = new PureHttp();

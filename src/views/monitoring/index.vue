@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col">
+  <div class="h-screen flex flex-col">
     <!-- Search Bar Section -->
     <div class="p-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-4">
@@ -7,7 +7,6 @@
           v-model="searchQuery"
           placeholder="Search traffic records..."
           clearable
-          class="flex-1"
           @input="handleSearch"
         >
           <template #prefix>
@@ -15,12 +14,7 @@
           </template>
         </el-input>
 
-        <el-select
-          v-model="selectedMethod"
-          placeholder="Method"
-          clearable
-          @change="handleFilterChange"
-        >
+        <el-select v-model="selectedMethod" placeholder="Method" clearable>
           <el-option label="GET" value="GET" />
           <el-option label="POST" value="POST" />
           <el-option label="PUT" value="PUT" />
@@ -28,12 +22,7 @@
           <el-option label="PATCH" value="PATCH" />
         </el-select>
 
-        <el-select
-          v-model="selectedStatus"
-          placeholder="Status"
-          clearable
-          @change="handleFilterChange"
-        >
+        <el-select v-model="selectedStatus" placeholder="Status" clearable>
           <el-option label="200 OK" value="200" />
           <el-option label="404 Not Found" value="404" />
           <el-option label="500 Server Error" value="500" />
@@ -42,42 +31,38 @@
       </div>
     </div>
 
-    <div class="h-full flex-1">
-      <!-- Main Content with Splitter -->
-      <div class="h-3/5">
+    <div class="flex flex-col flex-1 space-y-1">
+      <!-- Main Content -->
+      <div class="basis-3/5">
         <vxe-grid
           ref="vxeTableRef"
           show-overflow
           height="auto"
           :column-config="{ resizable: true }"
+          :row-config="{ isCurrent: true, isHover: true }"
           :scroll-y="{ enabled: true }"
           :columns="tableColumns"
           :data="filteredData"
+          @current-change="handleCurrentChange"
         />
       </div>
 
-      <div>
-        <splitpane :split-set="settingLR">
-          <template #paneL>
-            <DetailPanel
-              title="Request Details"
-              :data="selectedRow?.request"
-              :active-tab="requestActiveTab"
-              class="h-2/5"
-              @tab-change="requestActiveTab = $event"
-            />
-          </template>
+      <div class="basis-2/5 flex flex-row space-x-1 min-h-auto">
+        <DetailPanel
+          title="Request Details"
+          :data="selectedRow?.request"
+          :active-tab="requestActiveTab"
+          class="flex-1"
+          @tab-change="requestActiveTab = $event"
+        />
 
-          <template #paneR>
-            <DetailPanel
-              title="Response Details"
-              :data="selectedRow?.response"
-              :active-tab="responseActiveTab"
-              class="h-2/5"
-              @tab-change="responseActiveTab = $event"
-            />
-          </template>
-        </splitpane>
+        <DetailPanel
+          title="Response Details"
+          :data="selectedRow?.response"
+          :active-tab="responseActiveTab"
+          class="flex-1"
+          @tab-change="responseActiveTab = $event"
+        />
       </div>
     </div>
   </div>
@@ -87,7 +72,6 @@
 import { defineComponent, ref, computed, onMounted, reactive } from "vue";
 import { Search as SearchIcon } from "@element-plus/icons-vue";
 import DetailPanel from "./components/DetailPanel.vue";
-import SplitPane, { type ContextProps } from "@/components/ReSplitPane";
 
 interface TrafficRecord {
   id: string;
@@ -114,16 +98,9 @@ export default defineComponent({
   name: "TrafficMonitoring",
   components: {
     SearchIcon,
-    DetailPanel,
-    splitpane: SplitPane
+    DetailPanel
   },
   setup() {
-    // Splitter settings
-    const settingLR: ContextProps = reactive({
-      minPercent: 20,
-      defaultPercent: 50,
-      split: "vertical"
-    });
     // State
     const searchQuery = ref("");
     const selectedMethod = ref("");
@@ -173,7 +150,11 @@ export default defineComponent({
             body: JSON.stringify({
               id: i,
               action: "get",
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
+              data: Array.from({ length: 5 }, (_, idx) => ({
+                itemId: idx,
+                value: `Item ${idx}`
+              }))
             })
           },
           response: {
@@ -183,7 +164,10 @@ export default defineComponent({
               Server: "nginx/1.18.0"
             },
             body: JSON.stringify({
-              data: { id: i, name: `Item ${i}`, status: "active" },
+              data: Array.from({ length: 5 }, (_, idx) => ({
+                itemId: idx,
+                value: `Item ${idx}`
+              })),
               success: true,
               timestamp: new Date().toISOString()
             })
@@ -272,26 +256,23 @@ export default defineComponent({
       return filtered;
     });
 
-    const tableHeight = computed(() => {
-      return "calc(100% - 10px)";
-    });
-
     // Methods
     const handleSearch = () => {
       // Search is handled reactively by computed property
     };
 
-    const handleFilterChange = () => {
-      // Filtering is handled reactively by computed property
-    };
-
-    const handleCellClick = ({ row }: { row: TrafficRecord }) => {
-      selectedRow.value = row;
-    };
-
     const handleRefresh = () => {
       // Refresh logic here - could reload data from API
       console.log("Refreshing table data...");
+    };
+
+    const handleCurrentChange = ({ oldValue, newValue }) => {
+      console.log(
+        "current change: ",
+        JSON.stringify(oldValue),
+        JSON.stringify(newValue)
+      );
+      selectedRow.value = newValue;
     };
 
     // VXE Table row class handling
@@ -324,10 +305,6 @@ export default defineComponent({
     // Lifecycle
     onMounted(() => {
       mockData.value = generateMockData();
-      // Select first row by default
-      if (mockData.value.length > 0) {
-        selectedRow.value = mockData.value[0];
-      }
     });
 
     return {
@@ -340,11 +317,8 @@ export default defineComponent({
       responseActiveTab,
       tableColumns,
       filteredData,
-      tableHeight,
-      settingLR,
       handleSearch,
-      handleFilterChange,
-      handleCellClick,
+      handleCurrentChange,
       handleRefresh,
       getMethodClass,
       getStatusClass,

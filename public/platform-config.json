@@ -1,7 +1,7 @@
 {
   "Version": "6.1.0",
   "Title": "XFLOW",
-  "FixedHeader": false,
+  "FixedHeader": true,
   "HiddenSideBar": false,
   "MultiTagsCache": false,
   "KeepAlive": true,
