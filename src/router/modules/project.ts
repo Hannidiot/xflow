@@ -4,13 +4,22 @@ export default {
   path: "/project",
   name: "Project",
   component: Layout,
-  redirect: "/project/info",
+  redirect: "/project/list",
   meta: {
     icon: "ep:document",
     title: "项目信息",
     rank: 6
   },
   children: [
+    {
+      path: "/project/list",
+      name: "ProjectList",
+      component: () => import("@/views/project/list.vue"),
+      meta: {
+        title: "项目管理",
+        showLink: true
+      }
+    },
     {
       path: "/project/info",
       name: "ProjectInfo",
