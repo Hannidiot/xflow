@@ -8,10 +8,10 @@ const activeName = ref("first");
 
 <template>
   <el-tabs v-model="activeName">
-    <el-tab-pane label="标签一" name="first">
+    <el-tab-pane label="Tab 1" name="first">
       <ProjectInfo />
     </el-tab-pane>
-    <el-tab-pane label="标签二" name="second">
+    <el-tab-pane label="Tab 2" name="second">
       <TrafficMonitoring />
     </el-tab-pane>
   </el-tabs>

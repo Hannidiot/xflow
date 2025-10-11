@@ -79,6 +79,7 @@ export default defineComponent({
           <el-table
             key={i}
             data={data}
+            height="auto"
             row-style={markRowStyles}
             cell-style={markCellStyles}
           >

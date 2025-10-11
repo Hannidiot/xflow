@@ -180,33 +180,15 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-
-// Define interfaces
-interface SearchForm {
-  projectName: string;
-  productType: string;
-  status: string;
-}
-
-interface ProjectItem {
-  id: string;
-  projectName: string;
-  status: string;
-  productType: string;
-  description: string;
-  trafficCapture: boolean;
-  proxyStatus: string;
-  apiCount: number;
-  totalTraffic: string;
-  diskUsage: string;
-  updateTime: string;
-}
-
-interface Pagination {
-  currentPage: number;
-  pageSize: number;
-  total: number;
-}
+import {
+  getProjectList,
+  updateTrafficCapture,
+  deleteProject,
+  type ProjectItem,
+  type SearchForm,
+  type Pagination
+} from "@/api/project-list";
+import { projectListColumns } from "./list-columns";
 
 // State
 const searchForm = reactive<SearchForm>({
@@ -224,46 +206,29 @@ const pagination = reactive<Pagination>({
   total: 0
 });
 
-// Mock data generator
-const generateMockData = (): ProjectItem[] => {
-  const productTypes = ["电商平台", "移动应用", "企业系统"];
-  const statuses = ["active", "inactive"];
-  const proxyStatuses = ["running", "stopped"];
-
-  const data: ProjectItem[] = [];
-
-  for (let i = 1; i <= 3; i++) {
-    data.push({
-      id: `project-${i}`,
-      projectName: `电商平台V${i}`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      productType:
-        productTypes[Math.floor(Math.random() * productTypes.length)],
-      description: `电商平台第${i}版本`,
-      trafficCapture: Math.random() > 0.5,
-      proxyStatus:
-        proxyStatuses[Math.floor(Math.random() * proxyStatuses.length)],
-      apiCount: Math.floor(Math.random() * 200) + 50,
-      totalTraffic: `${(Math.random() * 5).toFixed(1)}M`,
-      diskUsage: `${(Math.random() * 5).toFixed(1)}GB`,
-      updateTime: `2024-01-${String(10 + i).padStart(2, "0")}`
-    });
-  }
-
-  return data;
-};
-
 // Methods
-const loadTableData = () => {
-  // In real application, this would be an API call
-  const mockData = generateMockData();
-  tableData.value = mockData;
-  pagination.total = mockData.length;
+const loadTableData = async () => {
+  try {
+    const response = await getProjectList({
+      projectName: searchForm.projectName,
+      productType: searchForm.productType,
+      status: searchForm.status,
+      currentPage: pagination.currentPage,
+      pageSize: pagination.pageSize
+    });
+
+    if (response.code === "200") {
+      tableData.value = response.data.data;
+      pagination.total = response.data.pagination.total;
+    }
+  } catch (error) {
+    console.error("Failed to load project list:", error);
+    ElMessage.error("加载项目列表失败");
+  }
 };
 
 const handleSearch = () => {
-  // Filter logic would go here
-  ElMessage.success("搜索功能待实现");
+  pagination.currentPage = 1;
   loadTableData();
 };
 
@@ -271,6 +236,7 @@ const handleReset = () => {
   searchForm.projectName = "";
   searchForm.productType = "";
   searchForm.status = "";
+  pagination.currentPage = 1;
   loadTableData();
   ElMessage.info("已重置搜索条件");
 };
@@ -284,10 +250,21 @@ const handleSelectionChange = (selection: ProjectItem[]) => {
   selectedRows.value = selection;
 };
 
-const handleTrafficCaptureChange = (row: ProjectItem) => {
-  ElMessage.success(
-    `已${row.trafficCapture ? "开启" : "关闭"}流量抓取: ${row.projectName}`
-  );
+const handleTrafficCaptureChange = async (row: ProjectItem) => {
+  try {
+    await updateTrafficCapture({
+      id: row.id,
+      trafficCapture: row.trafficCapture
+    });
+    ElMessage.success(
+      `已${row.trafficCapture ? "开启" : "关闭"}流量抓取: ${row.projectName}`
+    );
+  } catch (error) {
+    console.error("Failed to update traffic capture:", error);
+    ElMessage.error("更新流量抓取状态失败");
+    // Revert the change on error
+    row.trafficCapture = !row.trafficCapture;
+  }
 };
 
 const handleDetail = (row: ProjectItem) => {
@@ -300,24 +277,34 @@ const handleEdit = (row: ProjectItem) => {
   // Navigate to edit page or open dialog
 };
 
-const handleDelete = (row: ProjectItem) => {
-  ElMessageBox.confirm(`确定要删除项目 "${row.projectName}" 吗?`, "确认删除", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning"
-  })
-    .then(() => {
-      // Delete API call would go here
-      ElMessage.success("删除成功");
-      loadTableData();
-    })
-    .catch(() => {
+const handleDelete = async (row: ProjectItem) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除项目 "${row.projectName}" 吗?`,
+      "确认删除",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }
+    );
+
+    await deleteProject({ id: row.id });
+    ElMessage.success("删除成功");
+    loadTableData();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("Failed to delete project:", error);
+      ElMessage.error("删除项目失败");
+    } else {
       ElMessage.info("已取消删除");
-    });
+    }
+  }
 };
 
 const handleSizeChange = (size: number) => {
   pagination.pageSize = size;
+  pagination.currentPage = 1;
   loadTableData();
 };
 
@@ -333,8 +320,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-
-
 // Responsive
 @media (width <= 1199px) {
   .search-section {
