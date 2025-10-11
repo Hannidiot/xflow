@@ -21,6 +21,15 @@ export default {
       }
     },
     {
+      path: "/project/comparison",
+      name: "ProjectComparison",
+      component: () => import("@/views/project/comparison.vue"),
+      meta: {
+        title: "项目对比",
+        showLink: true
+      }
+    },
+    {
       path: "/project/info",
       name: "ProjectInfo",
       component: () => import("@/views/project/index.vue"),
