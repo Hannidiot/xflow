@@ -1,4 +1,4 @@
-# Project Configuraiton Page
+# Project Configuraiton Tab
 
 ## UI Design Document: Proxy Settings and Device Management Interface
 
@@ -67,56 +67,6 @@ In the operations column, there is a "test connectivity" button.
 
 **Using PureTable:**
 
-```vue
-<script setup lang="ts">
-import { ref } from "vue";
-import { tableData } from "./data";
-
-const tableRef = ref();
-const currentRow = ref();
-
-const setCurrent = (row?: any) => {
-  // 获取表格的方法 tableRef.value.getTableRef()
-  const { setCurrentRow } = tableRef.value.getTableRef();
-  setCurrentRow(row);
-};
-const handleCurrentChange = val => {
-  currentRow.value = val;
-};
-
-const columns: TableColumnList = [
-  {
-    label: "日期",
-    prop: "date"
-  },
-  {
-    label: "姓名",
-    prop: "name"
-  },
-  {
-    label: "地址",
-    prop: "address"
-  }
-];
-</script>
-
-<template>
-  <div>
-    <pure-table
-      ref="tableRef"
-      :data="tableData"
-      :columns="columns"
-      highlight-current-row
-      @page-current-change="handleCurrentChange"
-    />
-    <div style="margin-top: 20px">
-      <el-button @click="setCurrent(tableData[1])">Select second row</el-button>
-      <el-button @click="setCurrent()">Clear selection</el-button>
-    </div>
-  </div>
-</template>
-```
-
 **Table Columns Configuration:**
 
 - **Selection Column**: Radio button type, single selection only
@@ -178,6 +128,17 @@ interface Device {
 
 This design maintains the functional requirements while ensuring all components are visible in a single screen with adjustable sections for optimal user experience.
 
-### 8. Changelog
+### 8. Implement Requirements
 
-#### Initial Version
+1. put model definition under @src/api folder, remember to check if similar model exists before
+2. for all mock data, fetch them from api, you can refer to @/src/api/device.ts
+3. for return value of mock data, mock them in @/mock folder, you can refer to @/mock/device.ts
+4. for table columns, create a new ts file under @/src/views/project folder, and use columns from there.
+
+### 9. Changelog
+
+#### 1. Initial Version
+
+#### 2. v2
+
+1. for device management, use DeviceSelection component instead, refer to content under @/src\components\DeviceSelection folder. You can keep the header.

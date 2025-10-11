@@ -1,4 +1,4 @@
-# Project Info Page
+# Project Info Tab
 
 ## UI Design Document: Project Information Interface
 

@@ -37,6 +37,15 @@ export default {
         title: "项目信息",
         showLink: true
       }
+    },
+    {
+      path: "/project/configuration",
+      name: "ProjectConfiguration",
+      component: () => import("@/views/project/configuration.vue"),
+      meta: {
+        title: "项目配置",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;
