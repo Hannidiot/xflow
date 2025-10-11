@@ -40,8 +40,14 @@ export interface ProjectComparisonRequest {
 export interface ProjectComparisonResponse {
   projectA: ProjectItem;
   projectB: ProjectItem;
-  apiDiff: ApiDiffItem[];
-  vulnerabilityDiff: VulnerabilityDiffItem[];
+  apiDiff: {
+    projectA: ApiDiffItem[];
+    projectB: ApiDiffItem[];
+  };
+  vulnerabilityDiff: {
+    projectA: VulnerabilityDiffItem[];
+    projectB: VulnerabilityDiffItem[];
+  };
 }
 
 export interface ProjectListResponse {

@@ -167,3 +167,7 @@ The section is divided into two main sub-panels — one for API comparison, one 
 
 1. for table implementation, use pure-table instead of el-table, you can refer to @/src/components/DeviceSelection/src/index.tsx or @/src\views\test\data-intensity-table.vue. Also remember to modify the column definition tsx file to follow the type definition
 2. use tailwindcss instead of these scoped css statement.
+
+#### 3. v3
+
+1. for the difference table, use DiffTable, you can refer to @/src/views/test/diff-table.vue

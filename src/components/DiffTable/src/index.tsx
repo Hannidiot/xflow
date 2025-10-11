@@ -74,7 +74,7 @@ export default defineComponent({
     };
 
     return () => (
-      <div class="flex space-x-2">
+      <div class="flex">
         {completedData.value.map((data, i) => (
           <el-table
             key={i}

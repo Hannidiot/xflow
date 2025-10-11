@@ -138,10 +138,14 @@
       <!-- API Comparison -->
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">API Comparison</h3>
-        <pure-table
-          :data="comparisonResult.apiDiff"
+        <DiffTable
+          :data-group="[
+            comparisonResult.apiDiff.projectA,
+            comparisonResult.apiDiff.projectB
+          ]"
           :columns="apiDiffColumns"
-          :row-style="getRowStyle"
+          unique-key="id"
+          class="space-x-4"
         />
       </div>
 
@@ -159,10 +163,14 @@
         </div>
         <el-collapse-transition>
           <div v-show="showVulnerabilityDetails">
-            <pure-table
-              :data="comparisonResult.vulnerabilityDiff"
+            <DiffTable
+              :data-group="[
+                comparisonResult.vulnerabilityDiff.projectA,
+                comparisonResult.vulnerabilityDiff.projectB
+              ]"
               :columns="vulnerabilityDiffColumns"
-              :row-style="getRowStyle"
+              unique-key="id"
+              class="space-x-4"
             />
           </div>
         </el-collapse-transition>
@@ -196,6 +204,7 @@ import {
 } from "@/api/project-comparison";
 import type { ProjectItem } from "@/api/project-list";
 import { apiDiffColumns, vulnerabilityDiffColumns } from "./comparison-columns";
+import { DiffTable } from "@/components/DiffTable";
 
 // State
 const selectedProjectA = ref<string>("");
