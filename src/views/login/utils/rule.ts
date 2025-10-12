@@ -8,6 +8,18 @@ export const REGEXP_PWD =
 
 /** 登录校验 */
 const loginRules = reactive<FormRules>({
+  email: [
+    {
+      required: true,
+      message: transformI18n($t("login.pureUsernameReg")),
+      trigger: "blur"
+    },
+    {
+      type: "email",
+      message: "请输入有效的邮箱地址",
+      trigger: ["blur", "change"]
+    }
+  ],
   password: [
     {
       validator: (rule, value, callback) => {

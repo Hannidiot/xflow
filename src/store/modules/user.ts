@@ -7,7 +7,13 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import { type UserResult, getLogin } from "@/api/user";
+import type { Response } from "@/utils/http";
+import {
+  type LoginRequest,
+  type LoginResponseData,
+  loginUser,
+  logoutUser
+} from "@/api/auth";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
@@ -53,12 +59,23 @@ export const useUserStore = defineStore("pure-user", {
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
+    async loginByUsername(data: LoginRequest) {
+      return new Promise<Response<LoginResponseData>>((resolve, reject) => {
+        loginUser(data)
+          .then(response => {
+            if (response?.data) {
+              // Transform the new API response to match the expected format
+              const transformedData = {
+                accessToken: response.data.token,
+                expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24 hours expiry
+                username: response.data.username,
+                nickname: response.data.username,
+                roles: [response.data.role],
+                permissions: [] // No permissions field in new API response
+              };
+              setToken(transformedData);
+            }
+            resolve(response);
           })
           .catch(error => {
             reject(error);
@@ -66,7 +83,14 @@ export const useUserStore = defineStore("pure-user", {
       });
     },
     /** 登出 */
-    logOut() {
+    async logOut() {
+      try {
+        // Call logout API
+        await logoutUser();
+      } catch (error) {
+        console.error("Logout API call failed:", error);
+        // Continue with local logout even if API call fails
+      }
       this.username = "";
       this.roles = [];
       this.permissions = [];

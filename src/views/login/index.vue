@@ -44,7 +44,7 @@ const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
-  username: "admin",
+  email: "admin@example.com",
   password: "admin123"
 });
 
@@ -55,11 +55,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       loading.value = true;
       useUserStoreHook()
         .loginByUsername({
-          username: ruleForm.username,
+          email: ruleForm.email,
           password: ruleForm.password
         })
         .then(res => {
-          if (res.success) {
+          if (res.code === "200" && res.data) {
             // 获取后端路由
             return initRouter().then(() => {
               disabled.value = true;
@@ -166,10 +166,10 @@ useEventListener(document, "keydown", ({ code }) => {
                     trigger: 'blur'
                   }
                 ]"
-                prop="username"
+                prop="email"
               >
                 <el-input
-                  v-model="ruleForm.username"
+                  v-model="ruleForm.email"
                   clearable
                   :placeholder="t('login.pureUsername')"
                   :prefix-icon="useRenderIcon(User)"

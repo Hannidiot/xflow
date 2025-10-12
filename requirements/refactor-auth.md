@@ -10,3 +10,7 @@ This requirement aims to replace api part of current auth implementation in src/
 - currently, it will not call logout api when doing logout, remember to do so.
 - there is no permission field in the response of '/src/api/auth.ts', its ok to leave it empty.
 - modify the data model accordingly.
+
+## Changelog
+
+### v1. initial version
