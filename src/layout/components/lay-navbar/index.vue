@@ -19,7 +19,6 @@ const {
   onPanel,
   pureApp,
   username,
-  userAvatar,
   avatarsStyle,
   toggleSideBar,
   getDropdownItemStyle,

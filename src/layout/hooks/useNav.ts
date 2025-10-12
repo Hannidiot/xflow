@@ -2,7 +2,6 @@ import { storeToRefs } from "pinia";
 import { getConfig } from "@/config";
 import { useRouter } from "vue-router";
 import { emitter } from "@/utils/mitt";
-import Avatar from "@/assets/user.jpg";
 import { getTopMenu } from "@/router/utils";
 import { useFullscreen } from "@vueuse/core";
 import type { routeMetaType } from "../types";
@@ -36,13 +35,6 @@ export function useNav() {
       justifyContent: "space-between",
       overflow: "hidden"
     };
-  });
-
-  /** 头像（如果头像为空则使用 src/assets/user.jpg ） */
-  const userAvatar = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.avatar)
-      ? Avatar
-      : useUserStoreHook()?.avatar;
   });
 
   /** 昵称（如果昵称为空则显示用户名） */
@@ -166,7 +158,6 @@ export function useNav() {
     isCollapse,
     pureApp,
     username,
-    userAvatar,
     avatarsStyle,
     tooltipEffect,
     getDropdownItemStyle,
