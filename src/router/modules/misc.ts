@@ -55,6 +55,15 @@ export default {
         title: "HTTP 403测试",
         showLink: true
       }
+    },
+    {
+      path: "/test/dialog",
+      name: "DialogTest",
+      component: () => import("@/views/test/dialog.vue"),
+      meta: {
+        title: "弹框测试",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

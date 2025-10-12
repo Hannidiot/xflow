@@ -1,5 +1,5 @@
 <template>
-  <div class="h-dvh">
+  <div class="h-full">
     <!-- Header Section -->
     <div class="header-section">
       <h1 class="page-title">项目管理</h1>

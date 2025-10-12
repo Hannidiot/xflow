@@ -4,46 +4,46 @@ export const monitoringTableColumns: TableColumn[] = [
   {
     title: "Method",
     field: "method",
-    width: 80
+    minWidth: 80
   },
   {
     title: "URL",
     field: "url",
-    width: 300
+    minWidth: 300
   },
   {
     title: "Protocol",
     field: "protocol",
-    width: 100
+    minWidth: 100
   },
   {
     title: "Status",
     field: "statusCode",
-    width: 100
+    minWidth: 100
   },
   {
     title: "Status Text",
     field: "statusText",
-    width: 120
+    minWidth: 120
   },
   {
     title: "Size",
     field: "size",
-    width: 100
+    minWidth: 100
   },
   {
     title: "Time",
     field: "time",
-    width: 80
+    minWidth: 80
   },
   {
     title: "Content Type",
     field: "contentType",
-    width: 150
+    minWidth: 150
   },
   {
     title: "Timestamp",
     field: "timestamp",
-    width: 180
+    minWidth: 180
   }
 ];

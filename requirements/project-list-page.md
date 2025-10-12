@@ -160,3 +160,9 @@ It includes:
 ### 8. Changelog
 
 #### 1. Inital Version
+
+#### 2. Implement API changes
+
+- new api for projects are placed under '/src/api/projects.ts', pls do changes accordingly. It should include model definition, column defintion.
+- The product type is dynamically loaded via api call in onMount hook, and current filter logic on product type is not correct.
+- Implement the Create Project button,
