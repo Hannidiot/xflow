@@ -110,7 +110,7 @@ export default defineFakeRoute([
         code: "200",
         err_msg: success ? "" : "Connection failed",
         data: {
-          success,
+          testResult: success,
           message: success
             ? "Connection test successful"
             : "Connection test failed"

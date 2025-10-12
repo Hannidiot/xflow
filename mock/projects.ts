@@ -89,7 +89,7 @@ export default defineFakeRoute([
       const projects = filteredProjects.slice(startIndex, endIndex);
 
       return {
-        success: true,
+        code: "200",
         data: {
           projects,
           pagination: {
@@ -110,7 +110,7 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (!body.name) {
         return {
-          success: false,
+          code: "400",
           message: "缺少必填字段: name"
         };
       }
@@ -119,7 +119,7 @@ export default defineFakeRoute([
       const existingProject = allProjects.find(p => p.name === body.name);
       if (existingProject) {
         return {
-          success: false,
+          code: "400",
           message: "项目名已存在"
         };
       }
@@ -137,7 +137,7 @@ export default defineFakeRoute([
       allProjects.unshift(newProject);
 
       return {
-        success: true,
+        code: "200",
         data: newProject,
         message: "项目创建成功"
       };
@@ -153,13 +153,13 @@ export default defineFakeRoute([
 
       if (!project) {
         return {
-          success: false,
+          code: "400",
           message: "项目不存在"
         };
       }
 
       return {
-        success: true,
+        code: "200",
         data: project
       };
     }
@@ -176,7 +176,7 @@ export default defineFakeRoute([
 
       if (projectIndex === -1) {
         return {
-          success: false,
+          code: "400",
           message: "项目不存在"
         };
       }
@@ -188,7 +188,7 @@ export default defineFakeRoute([
         );
         if (nameExists) {
           return {
-            success: false,
+            code: "400",
             message: "项目名已存在"
           };
         }
@@ -202,7 +202,7 @@ export default defineFakeRoute([
       };
 
       return {
-        success: true,
+        code: "200",
         data: null,
         message: "项目更新成功"
       };
@@ -220,7 +220,7 @@ export default defineFakeRoute([
 
       if (projectIndex === -1) {
         return {
-          success: false,
+          code: "400",
           message: "项目不存在"
         };
       }
@@ -228,7 +228,7 @@ export default defineFakeRoute([
       allProjects.splice(projectIndex, 1);
 
       return {
-        success: true,
+        code: "200",
         data: null,
         message: "项目删除成功"
       };
@@ -241,7 +241,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: projectTypes
       };
     }

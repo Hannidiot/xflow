@@ -1,7 +1,7 @@
 import { addDialog, closeAllDialog } from "@/components/ReDialog";
+import { $t } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { ref } from "vue";
-import { $t } from "@/plugins/i18n";
 
 const onCloseDialog = () => {
   loginExpiredDialogShown.value = false;
@@ -20,6 +20,7 @@ export const showLoginExpiredDialog = () => {
     closeOnPressEscape: false,
     closeOnClickModal: false,
     hideFooter: true,
+    closeCallBack: onCloseDialog,
     contentRenderer: () => (
       <>
         <el-result title={$t("login.expiredMessage")} icon="error">

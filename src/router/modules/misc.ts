@@ -46,6 +46,15 @@ export default {
         title: "多标签页",
         showLink: true
       }
+    },
+    {
+      path: "/test/http-403-test",
+      name: "Http403Test",
+      component: () => import("@/views/test/http-403-test.vue"),
+      meta: {
+        title: "HTTP 403测试",
+        showLink: true
+      }
     }
   ]
 } satisfies RouteConfigsTable;

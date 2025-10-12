@@ -20,14 +20,13 @@ import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
     // 用户名
-    username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
+    username: storageLocal().getItem<DataInfo>(userKey)?.username ?? "",
     // 昵称
-    nickname: storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "",
+    nickname: storageLocal().getItem<DataInfo>(userKey)?.nickname ?? "",
     // 页面级别权限
-    roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
+    roles: storageLocal().getItem<DataInfo>(userKey)?.roles ?? [],
     // 按钮级别权限
-    permissions:
-      storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [],
+    permissions: storageLocal().getItem<DataInfo>(userKey)?.permissions ?? [],
     // 是否勾选了登录页的免登录
     isRemembered: false,
     // 登录页的免登录存储几天，默认7天
@@ -67,7 +66,6 @@ export const useUserStore = defineStore("pure-user", {
               // Transform the new API response to match the expected format
               const transformedData = {
                 accessToken: response.data.token,
-                expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24 hours expiry
                 username: response.data.username,
                 nickname: response.data.username,
                 roles: [response.data.role],

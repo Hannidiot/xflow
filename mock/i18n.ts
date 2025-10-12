@@ -60,9 +60,8 @@ export default defineFakeRoute([
       const messages = getMessage(lang);
 
       return {
-        success: true,
+        code: "200",
         message: messages.languages_success,
-        code: 200,
         data: {
           languages: languages.languages,
           current_language: lang
@@ -80,9 +79,8 @@ export default defineFakeRoute([
       const messages = getMessage(lang);
 
       return {
-        success: true,
+        code: "200",
         message: messages.language_success,
-        code: 200,
         data: {
           language: lang
         }
@@ -100,25 +98,22 @@ export default defineFakeRoute([
 
       if (!body.language) {
         return {
-          success: false,
-          message: messages.missing_language,
-          code: 400
+          code: "400",
+          message: messages.missing_language
         };
       }
 
       const supportedLanguages = ["zh_CN", "en_US", "ja_JP"];
       if (!supportedLanguages.includes(body.language)) {
         return {
-          success: false,
-          message: messages.unsupported_language,
-          code: 400
+          code: "400",
+          message: messages.unsupported_language
         };
       }
 
       return {
-        success: true,
+        code: "200",
         message: messages.set_language_success,
-        code: 200,
         data: {
           language: body.language
         }

@@ -89,20 +89,20 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (!body.username || !body.email || !body.password) {
         return {
-          success: false,
+          code: "400",
           message: "缺少必填字段"
         };
       }
 
       if (body.username === "admin") {
         return {
-          success: false,
+          code: "400",
           message: "用户名已存在"
         };
       }
 
       return {
-        success: true,
+        code: "200",
         data: {
           _id: "507f1f77bcf86cd799439011",
           username: body.username,
@@ -122,14 +122,14 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (!body.email || !body.password) {
         return {
-          success: false,
+          code: "400",
           message: "邮箱和密码不能为空"
         };
       }
 
       if (body.email === "admin@example.com" && body.password === "admin123") {
         return {
-          success: true,
+          code: "200",
           data: {
             user_id: "507f1f77bcf86cd799439012",
             username: "admin",
@@ -146,7 +146,7 @@ export default defineFakeRoute([
         body.password === "password123"
       ) {
         return {
-          success: true,
+          code: "200",
           data: {
             user_id: "507f1f77bcf86cd799439011",
             username: "john_doe",
@@ -159,7 +159,7 @@ export default defineFakeRoute([
       }
 
       return {
-        success: false,
+        code: "400",
         message: "邮箱或密码错误"
       };
     }
@@ -171,7 +171,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: null,
         message: "登出成功"
       };
@@ -186,7 +186,7 @@ export default defineFakeRoute([
       const authHeader = headers.authorization;
       if (!authHeader || !authHeader.includes("Bearer ")) {
         return {
-          success: false,
+          code: "401",
           message: "未认证"
         };
       }
@@ -194,13 +194,13 @@ export default defineFakeRoute([
       const token = authHeader.replace("Bearer ", "");
       if (token === "eyJhbGciOiJIUzUxMiJ9.admin") {
         return {
-          success: true,
+          code: "200",
           data: mockAdminUser
         };
       }
 
       return {
-        success: true,
+        code: "200",
         data: mockUser
       };
     }
@@ -212,7 +212,7 @@ export default defineFakeRoute([
     method: "put",
     response: ({ _ }) => {
       return {
-        success: true,
+        code: "200",
         data: null,
         message: "更新成功"
       };
@@ -225,7 +225,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {
           tokens: generateTokens(3)
         }
@@ -239,7 +239,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {
           revoked_count: 3
         },
@@ -263,7 +263,7 @@ export default defineFakeRoute([
       const tokens = allTokens.slice(startIndex, endIndex);
 
       return {
-        success: true,
+        code: "200",
         data: {
           tokens,
           pagination: {
@@ -283,7 +283,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {
           cleaned_count: 5
         },
@@ -298,7 +298,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {
           total_tokens: 150,
           active_tokens: 120,
@@ -320,6 +320,50 @@ export default defineFakeRoute([
           ]
         }
       };
+    }
+  },
+
+  // 测试403响应 - 模拟token过期
+  {
+    url: "/auth/test/expired-token",
+    method: "get",
+    response: () => {
+      return {
+        code: "403",
+        err_msg: "Token expired",
+        data: null
+      };
+    }
+  },
+
+  // 测试403响应 - 模拟权限不足
+  {
+    url: "/auth/test/insufficient-permissions",
+    method: "get",
+    response: () => {
+      return {
+        code: "403",
+        err_msg: "Insufficient permissions",
+        data: null
+      };
+    }
+  },
+
+  // 测试403响应 - 带延迟
+  {
+    url: "/auth/test/delayed-403",
+    method: "get",
+    response: ({ _ }) => {
+      // 模拟网络延迟
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            code: "403",
+            err_msg: "Token expired (delayed)",
+            data: null
+          });
+        }, 2000);
+      });
     }
   }
 ]);

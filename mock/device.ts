@@ -32,7 +32,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: interface_list
       };
     }
@@ -42,7 +42,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: device_list
       };
     }
@@ -52,7 +52,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {}
       };
     }
@@ -62,7 +62,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {}
       };
     }
@@ -72,7 +72,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
-        success: true,
+        code: "200",
         data: {}
       };
     }
