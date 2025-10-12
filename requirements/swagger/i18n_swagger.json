@@ -1,0 +1,558 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "XFlow API - 国际化模块",
+    "description": "XFlow API的国际化（i18n）模块，支持多语言切换和语言管理功能",
+    "version": "1.0.0",
+    "contact": {
+      "name": "XFlow API Support",
+      "email": "support@xflow.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "开发环境服务器"
+    },
+    {
+      "url": "https://api.xflow.com/v1",
+      "description": "生产环境服务器"
+    }
+  ],
+  "tags": [
+    {
+      "name": "国际化",
+      "description": "多语言支持和语言管理相关接口"
+    }
+  ],
+  "paths": {
+    "/i18n/languages": {
+      "get": {
+        "tags": ["国际化"],
+        "summary": "获取支持的语言列表",
+        "description": "获取系统支持的所有语言列表，包括语言代码、英文名称和本地名称",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "语言代码，用于返回相应语言的响应消息",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["zh_CN", "en_US", "ja_JP"],
+              "default": "zh_CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取语言列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "获取语言列表成功"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "languages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "description": "语言代码",
+                                "example": "zh_CN"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "英文名称",
+                                "example": "Chinese (Simplified)"
+                              },
+                              "native_name": {
+                                "type": "string",
+                                "description": "本地名称",
+                                "example": "简体中文"
+                              }
+                            }
+                          }
+                        },
+                        "current_language": {
+                          "type": "string",
+                          "description": "当前语言代码",
+                          "example": "zh_CN"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "zh_CN": {
+                    "summary": "中文响应",
+                    "value": {
+                      "success": true,
+                      "message": "获取语言列表成功",
+                      "code": 200,
+                      "data": {
+                        "languages": [
+                          {
+                            "code": "zh_CN",
+                            "name": "Chinese (Simplified)",
+                            "native_name": "简体中文"
+                          },
+                          {
+                            "code": "en_US",
+                            "name": "English (US)",
+                            "native_name": "English"
+                          },
+                          {
+                            "code": "ja_JP",
+                            "name": "Japanese",
+                            "native_name": "日本語"
+                          }
+                        ],
+                        "current_language": "zh_CN"
+                      }
+                    }
+                  },
+                  "en_US": {
+                    "summary": "English Response",
+                    "value": {
+                      "success": true,
+                      "message": "Language list retrieved successfully",
+                      "code": 200,
+                      "data": {
+                        "languages": [
+                          {
+                            "code": "zh_CN",
+                            "name": "Chinese (Simplified)",
+                            "native_name": "简体中文"
+                          },
+                          {
+                            "code": "en_US",
+                            "name": "English (US)",
+                            "native_name": "English"
+                          },
+                          {
+                            "code": "ja_JP",
+                            "name": "Japanese",
+                            "native_name": "日本語"
+                          }
+                        ],
+                        "current_language": "en_US"
+                      }
+                    }
+                  },
+                  "ja_JP": {
+                    "summary": "日本語レスポンス",
+                    "value": {
+                      "success": true,
+                      "message": "言語リストの取得が成功しました",
+                      "code": 200,
+                      "data": {
+                        "languages": [
+                          {
+                            "code": "zh_CN",
+                            "name": "Chinese (Simplified)",
+                            "native_name": "简体中文"
+                          },
+                          {
+                            "code": "en_US",
+                            "name": "English (US)",
+                            "native_name": "English"
+                          },
+                          {
+                            "code": "ja_JP",
+                            "name": "Japanese",
+                            "native_name": "日本語"
+                          }
+                        ],
+                        "current_language": "ja_JP"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/i18n/language": {
+      "get": {
+        "tags": ["国际化"],
+        "summary": "获取当前语言",
+        "description": "获取当前请求的语言设置",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "语言代码，用于返回相应语言的响应消息",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["zh_CN", "en_US", "ja_JP"],
+              "default": "zh_CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取当前语言",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "获取当前语言成功"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "language": {
+                          "type": "string",
+                          "description": "当前语言代码",
+                          "example": "zh_CN"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "zh_CN": {
+                    "summary": "中文响应",
+                    "value": {
+                      "success": true,
+                      "message": "获取当前语言成功",
+                      "code": 200,
+                      "data": {
+                        "language": "zh_CN"
+                      }
+                    }
+                  },
+                  "en_US": {
+                    "summary": "English Response",
+                    "value": {
+                      "success": true,
+                      "message": "Current language retrieved successfully",
+                      "code": 200,
+                      "data": {
+                        "language": "en_US"
+                      }
+                    }
+                  },
+                  "ja_JP": {
+                    "summary": "日本語レスポンス",
+                    "value": {
+                      "success": true,
+                      "message": "現在の言語の取得が成功しました",
+                      "code": 200,
+                      "data": {
+                        "language": "ja_JP"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["国际化"],
+        "summary": "设置当前语言",
+        "description": "设置当前请求的语言，影响后续API响应的语言",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "语言代码，用于返回相应语言的响应消息",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["zh_CN", "en_US", "ja_JP"],
+              "default": "zh_CN"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["language"],
+                "properties": {
+                  "language": {
+                    "type": "string",
+                    "description": "要设置的语言代码",
+                    "enum": ["zh_CN", "en_US", "ja_JP"],
+                    "example": "en_US"
+                  }
+                }
+              },
+              "examples": {
+                "set_chinese": {
+                  "summary": "设置为中文",
+                  "value": {
+                    "language": "zh_CN"
+                  }
+                },
+                "set_english": {
+                  "summary": "Set to English",
+                  "value": {
+                    "language": "en_US"
+                  }
+                },
+                "set_japanese": {
+                  "summary": "日本語に設定",
+                  "value": {
+                    "language": "ja_JP"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功设置语言",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "语言设置成功"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "language": {
+                          "type": "string",
+                          "description": "设置后的语言代码",
+                          "example": "en_US"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "zh_CN": {
+                    "summary": "中文响应",
+                    "value": {
+                      "success": true,
+                      "message": "语言设置成功",
+                      "code": 200,
+                      "data": {
+                        "language": "zh_CN"
+                      }
+                    }
+                  },
+                  "en_US": {
+                    "summary": "English Response",
+                    "value": {
+                      "success": true,
+                      "message": "Language set successfully",
+                      "code": 200,
+                      "data": {
+                        "language": "en_US"
+                      }
+                    }
+                  },
+                  "ja_JP": {
+                    "summary": "日本語レスポンス",
+                    "value": {
+                      "success": true,
+                      "message": "言語設定が成功しました",
+                      "code": 200,
+                      "data": {
+                        "language": "ja_JP"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "缺少语言参数"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 400
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_language": {
+                    "summary": "缺少语言参数",
+                    "value": {
+                      "success": false,
+                      "message": "缺少语言参数",
+                      "code": 400
+                    }
+                  },
+                  "unsupported_language": {
+                    "summary": "不支持的语言",
+                    "value": {
+                      "success": false,
+                      "message": "不支持的语言",
+                      "code": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "操作失败"
+          },
+          "code": {
+            "type": "integer",
+            "example": 500
+          },
+          "details": {
+            "type": "object",
+            "description": "错误详情（可选）"
+          }
+        }
+      },
+      "LanguageInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "语言代码",
+            "example": "zh_CN"
+          },
+          "name": {
+            "type": "string",
+            "description": "英文名称",
+            "example": "Chinese (Simplified)"
+          },
+          "native_name": {
+            "type": "string",
+            "description": "本地名称",
+            "example": "简体中文"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "LanguageParam": {
+        "name": "lang",
+        "in": "query",
+        "description": "语言代码，用于返回相应语言的响应消息",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": ["zh_CN", "en_US", "ja_JP"],
+          "default": "zh_CN"
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "国际化模块",
+      "tags": ["国际化"]
+    }
+  ],
+  "x-logo": {
+    "url": "https://xflow.com/logo.png",
+    "altText": "XFlow API"
+  },
+  "externalDocs": {
+    "description": "XFlow API 完整文档",
+    "url": "https://docs.xflow.com"
+  }
+}

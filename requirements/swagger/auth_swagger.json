@@ -1,0 +1,1167 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "XFlow Auth API",
+    "description": "XFlow认证模块API文档 - 提供用户注册、登录、JWT令牌管理等功能",
+    "version": "1.0.0",
+    "contact": {
+      "name": "XFlow Team",
+      "email": "support@xflow.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "开发环境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "用户认证",
+      "description": "用户注册、登录、登出等基础认证功能"
+    },
+    {
+      "name": "用户管理",
+      "description": "用户信息管理、个人资料更新"
+    },
+    {
+      "name": "令牌管理",
+      "description": "JWT令牌查看、撤销等管理功能"
+    },
+    {
+      "name": "管理员功能",
+      "description": "管理员专用功能，包括令牌统计和管理"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户注册",
+        "description": "创建新用户账户",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "email", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "用户名",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "john_doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "邮箱地址",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "minLength": 6,
+                    "example": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "_id": "507f1f77bcf86cd799439011",
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "role": "user",
+                    "is_active": true
+                  },
+                  "message": "注册成功"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "email_format_error": {
+                    "summary": "邮箱格式错误",
+                    "value": {
+                      "success": false,
+                      "message": "邮箱格式不正确"
+                    }
+                  },
+                  "password_too_short": {
+                    "summary": "密码太短",
+                    "value": {
+                      "success": false,
+                      "message": "密码长度至少6位"
+                    }
+                  },
+                  "username_exists": {
+                    "summary": "用户名已存在",
+                    "value": {
+                      "success": false,
+                      "message": "用户名已存在"
+                    }
+                  },
+                  "email_exists": {
+                    "summary": "邮箱已存在",
+                    "value": {
+                      "success": false,
+                      "message": "邮箱已存在"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户登录",
+        "description": "用户登录并获取JWT令牌",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "邮箱地址",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "example": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "user_id": "507f1f77bcf86cd799439011",
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "role": "user",
+                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  },
+                  "message": "登录成功"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "认证失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "user_not_found": {
+                    "summary": "用户不存在",
+                    "value": {
+                      "success": false,
+                      "message": "用户不存在"
+                    }
+                  },
+                  "wrong_password": {
+                    "summary": "密码错误",
+                    "value": {
+                      "success": false,
+                      "message": "密码错误"
+                    }
+                  },
+                  "account_disabled": {
+                    "summary": "账户被禁用",
+                    "value": {
+                      "success": false,
+                      "message": "账户已被禁用"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["用户认证"],
+        "summary": "用户登出",
+        "description": "登出并撤销当前JWT令牌",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "登出成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": null,
+                  "message": "登出成功"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "tags": ["用户管理"],
+        "summary": "获取用户信息",
+        "description": "获取当前用户的详细信息",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "user_id": "507f1f77bcf86cd799439011",
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "role": "user",
+                    "is_active": true,
+                    "created_at": "2024-01-01T10:00:00Z",
+                    "last_login": "2024-01-02T15:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "用户不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["用户管理"],
+        "summary": "更新用户信息",
+        "description": "更新当前用户的个人信息",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "用户名",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "new_username"
+                  },
+                  "profile": {
+                    "type": "object",
+                    "description": "用户资料信息",
+                    "properties": {
+                      "nickname": {
+                        "type": "string",
+                        "example": "John"
+                      },
+                      "bio": {
+                        "type": "string",
+                        "example": "Software Developer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": null,
+                  "message": "更新成功"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tokens": {
+      "get": {
+        "tags": ["令牌管理"],
+        "summary": "获取用户令牌列表",
+        "description": "获取当前用户的所有活跃令牌",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTokensResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "tokens": [
+                      {
+                        "id": "507f1f77bcf86cd799439011",
+                        "created_at": "2024-01-01T10:00:00Z",
+                        "expires_at": "2024-01-08T10:00:00Z",
+                        "is_active": true
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tokens/revoke-all": {
+      "post": {
+        "tags": ["令牌管理"],
+        "summary": "撤销所有令牌",
+        "description": "撤销当前用户的所有活跃令牌",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "撤销成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokeTokensResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "revoked_count": 3
+                  },
+                  "message": "已撤销所有令牌"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/admin/tokens": {
+      "get": {
+        "tags": ["管理员功能"],
+        "summary": "获取所有令牌",
+        "description": "获取系统中所有用户的令牌列表（仅管理员）",
+        "security": [{"BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "用户ID筛选",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "description": "是否活跃筛选",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminTokensResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "需要管理员权限"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/admin/tokens/cleanup": {
+      "post": {
+        "tags": ["管理员功能"],
+        "summary": "清理过期令牌",
+        "description": "清理系统中所有过期的令牌（仅管理员）",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "清理成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupTokensResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "cleaned_count": 15
+                  },
+                  "message": "已清理 15 个过期令牌"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/admin/tokens/stats": {
+      "get": {
+        "tags": ["管理员功能"],
+        "summary": "获取令牌统计",
+        "description": "获取系统中令牌的统计信息（仅管理员）",
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenStatsResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "total_tokens": 150,
+                    "active_tokens": 120,
+                    "expired_tokens": 30,
+                    "today_tokens": 5,
+                    "top_users": [
+                      {
+                        "_id": "507f1f77bcf86cd799439011",
+                        "token_count": 3,
+                        "username": "john_doe",
+                        "email": "john@example.com"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT令牌认证，格式：Bearer <token>"
+      }
+    },
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "description": "响应数据"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息",
+            "example": "操作成功"
+          }
+        },
+        "required": ["success", "message"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "错误消息",
+            "example": "操作失败"
+          }
+        },
+        "required": ["success", "message"]
+      },
+      "LoginResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "description": "用户ID",
+                    "example": "507f1f77bcf86cd799439011"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "用户名",
+                    "example": "john_doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "邮箱地址",
+                    "example": "john@example.com"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "用户角色",
+                    "enum": ["user", "admin"],
+                    "example": "user"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "JWT令牌",
+                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  }
+                },
+                "required": ["user_id", "username", "email", "role", "token"]
+              }
+            }
+          }
+        ]
+      },
+      "UserProfileResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "description": "用户ID",
+                    "example": "507f1f77bcf86cd799439011"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "用户名",
+                    "example": "john_doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "邮箱地址",
+                    "example": "john@example.com"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "用户角色",
+                    "enum": ["user", "admin"],
+                    "example": "user"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "description": "是否活跃",
+                    "example": true
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "创建时间",
+                    "example": "2024-01-01T10:00:00Z"
+                  },
+                  "last_login": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "最后登录时间",
+                    "example": "2024-01-02T15:30:00Z"
+                  }
+                },
+                "required": ["user_id", "username", "email", "role", "is_active"]
+              }
+            }
+          }
+        ]
+      },
+      "UserTokensResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "tokens": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/TokenInfo"
+                    }
+                  }
+                },
+                "required": ["tokens"]
+              }
+            }
+          }
+        ]
+      },
+      "TokenInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "令牌ID",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "过期时间",
+            "example": "2024-01-08T10:00:00Z"
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "是否活跃",
+            "example": true
+          }
+        },
+        "required": ["id", "created_at", "expires_at", "is_active"]
+      },
+      "RevokeTokensResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "revoked_count": {
+                    "type": "integer",
+                    "description": "撤销的令牌数量",
+                    "example": 3
+                  }
+                },
+                "required": ["revoked_count"]
+              }
+            }
+          }
+        ]
+      },
+      "AdminTokensResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "tokens": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/AdminTokenInfo"
+                    }
+                  },
+                  "pagination": {
+                    "$ref": "#/components/schemas/PaginationInfo"
+                  }
+                },
+                "required": ["tokens", "pagination"]
+              }
+            }
+          }
+        ]
+      },
+      "AdminTokenInfo": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TokenInfo"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "user_id": {
+                "type": "string",
+                "description": "用户ID",
+                "example": "507f1f77bcf86cd799439011"
+              },
+              "username": {
+                "type": "string",
+                "description": "用户名",
+                "example": "john_doe"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "邮箱地址",
+                "example": "john@example.com"
+              },
+              "role": {
+                "type": "string",
+                "description": "用户角色",
+                "enum": ["user", "admin"],
+                "example": "user"
+              },
+              "last_used": {
+                "type": "string",
+                "format": "date-time",
+                "description": "最后使用时间",
+                "example": "2024-01-02T15:30:00Z"
+              },
+              "revoked_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "撤销时间",
+                "nullable": true,
+                "example": null
+              }
+            },
+            "required": ["user_id", "username", "email", "role"]
+          }
+        ]
+      },
+      "PaginationInfo": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "当前页码",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "每页数量",
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "description": "总数量",
+            "example": 100
+          },
+          "pages": {
+            "type": "integer",
+            "description": "总页数",
+            "example": 5
+          }
+        },
+        "required": ["page", "per_page", "total", "pages"]
+      },
+      "CleanupTokensResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "cleaned_count": {
+                    "type": "integer",
+                    "description": "清理的令牌数量",
+                    "example": 15
+                  }
+                },
+                "required": ["cleaned_count"]
+              }
+            }
+          }
+        ]
+      },
+      "TokenStatsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "total_tokens": {
+                    "type": "integer",
+                    "description": "总令牌数",
+                    "example": 150
+                  },
+                  "active_tokens": {
+                    "type": "integer",
+                    "description": "活跃令牌数",
+                    "example": 120
+                  },
+                  "expired_tokens": {
+                    "type": "integer",
+                    "description": "过期令牌数",
+                    "example": 30
+                  },
+                  "today_tokens": {
+                    "type": "integer",
+                    "description": "今日新增令牌数",
+                    "example": 5
+                  },
+                  "top_users": {
+                    "type": "array",
+                    "description": "令牌数量最多的用户",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "description": "用户ID",
+                          "example": "507f1f77bcf86cd799439011"
+                        },
+                        "token_count": {
+                          "type": "integer",
+                          "description": "令牌数量",
+                          "example": 3
+                        },
+                        "username": {
+                          "type": "string",
+                          "description": "用户名",
+                          "example": "john_doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "邮箱地址",
+                          "example": "john@example.com"
+                        }
+                      },
+                      "required": ["_id", "token_count", "username", "email"]
+                    }
+                  }
+                },
+                "required": ["total_tokens", "active_tokens", "expired_tokens", "today_tokens", "top_users"]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
