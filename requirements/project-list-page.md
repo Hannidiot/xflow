@@ -165,4 +165,9 @@ It includes:
 
 - new api for projects are placed under '/src/api/projects.ts', pls do changes accordingly. It should include model definition, column defintion.
 - The product type is dynamically loaded via api call in onMount hook, and current filter logic on product type is not correct.
-- Implement the Create Project button,
+- Implement the Create Project button, it opens a dialog which contains a form. After submitting the form, it will call web api and create the project. You can refer to below files
+  - '/src/views/test/dialog.vue'
+  - '/src/views/test/dialog-form.vue'
+  - '/src/views/test/utils/rule.ts'
+  - '/src/views/test/utils/type.ts'
+- Instead of using scoped css, use tailwindcss instead.

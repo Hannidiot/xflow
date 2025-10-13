@@ -6,8 +6,9 @@
 import dayjs from "dayjs";
 import { computed } from "vue";
 
+// todo: enable filter
 const date = dayjs(new Date()).format("YYYY-MM-DD");
-const shadowColor = "oklch(96.7% 0.001 286.375)";
+const shadowColor = "oklch(89.2% 0.058 10.001)";
 
 const maxAmount = computed(() =>
   Math.max(...tableData.map(item => item.amount))

@@ -99,9 +99,8 @@ class PureHttp {
           return response.data;
         }
 
-        const data = response.data as Response<any>;
-        // todo: determine expire logic
-        if (data.code == "403") {
+        // handle token expiration
+        if (response.status == 401) {
           showLoginExpiredDialog();
           return response.data;
         }

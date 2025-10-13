@@ -1,40 +1,42 @@
 <template>
   <div class="h-full">
     <!-- Header Section -->
-    <div class="header-section">
-      <h1 class="page-title">项目管理</h1>
-      <p class="page-subtitle">管理和监控您的流量分析项目</p>
+    <div class="bg-white p-6 mb-4 border-b border-gray-200 rounded-lg">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">项目管理</h1>
+      <p class="text-sm text-gray-600">管理和监控您的流量分析项目</p>
     </div>
 
     <!-- Search/Filter Section -->
-    <div class="search-section">
-      <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item>
+    <div
+      class="bg-white p-6 mb-4 rounded-lg shadow-sm flex items-center justify-between"
+    >
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item class="min-w-[150px]">
           <el-input
             v-model="searchForm.projectName"
             placeholder="请输入项目名称"
             clearable
-            style="width: 200px"
           />
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="min-w-[150px]">
           <el-select
             v-model="searchForm.productType"
             placeholder="请选择产品"
             clearable
-            style="width: 160px"
           >
-            <el-option label="电商平台" value="ecommerce" />
-            <el-option label="移动应用" value="mobile" />
-            <el-option label="企业系统" value="enterprise" />
+            <el-option
+              v-for="type in productTypes"
+              :key="type._id"
+              :label="type.name"
+              :value="type.code"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="min-w-[150px]">
           <el-select
             v-model="searchForm.status"
             placeholder="请选择状态"
             clearable
-            style="width: 140px"
           >
             <el-option label="活跃" value="active" />
             <el-option label="非活跃" value="inactive" />
@@ -45,7 +47,7 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-      <div class="create-button">
+      <div class="ml-3">
         <el-button type="primary" @click="handleCreate">
           <el-icon><Plus /></el-icon>
           创建项目
@@ -54,80 +56,36 @@
     </div>
 
     <!-- Table Section -->
-    <div class="table-section">
+    <div class="bg-white p-4 rounded-lg shadow-sm">
       <el-table
         :data="tableData"
-        style="width: 100%"
+        class="w-full text-sm"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column prop="projectName" label="项目名称" width="180">
+        <el-table-column prop="name" label="项目名称" width="180">
           <template #default="{ row }">
             <el-link type="primary" @click="handleDetail(row)">
-              {{ row.projectName }}
+              {{ row.name }}
             </el-link>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="status"
-          label="状态标签"
-          width="100"
-          align="center"
-        >
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'info'">
-              {{ row.status === "active" ? "活跃" : "非活跃" }}
-            </el-tag>
+        <el-table-column label="状态标签" width="100" align="center">
+          <template>
+            <el-tag type="success"> 活跃 </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="productType" label="产品类型" width="120" />
+        <el-table-column label="产品类型" width="120">
+          <template #default="{ row }">
+            {{ row.type || "未设置" }}
+          </template>
+        </el-table-column>
         <el-table-column prop="description" label="描述" min-width="150" />
-        <el-table-column
-          prop="trafficCapture"
-          label="流量抓取"
-          width="100"
-          align="center"
-        >
+        <el-table-column label="更新时间" width="120">
           <template #default="{ row }">
-            <el-switch
-              v-model="row.trafficCapture"
-              @change="handleTrafficCaptureChange(row)"
-            />
+            {{ formatDate(row.updated_at) }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="proxyStatus"
-          label="代理状态"
-          width="100"
-          align="center"
-        >
-          <template #default="{ row }">
-            <el-tag
-              :type="row.proxyStatus === 'running' ? 'success' : 'danger'"
-            >
-              {{ row.proxyStatus === "running" ? "运行中" : "已停止" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="apiCount"
-          label="API数量"
-          width="100"
-          align="center"
-        />
-        <el-table-column
-          prop="totalTraffic"
-          label="总流量"
-          width="100"
-          align="center"
-        />
-        <el-table-column
-          prop="diskUsage"
-          label="磁盘占用"
-          width="110"
-          align="center"
-        />
-        <el-table-column prop="updateTime" label="更新时间" width="120" />
         <el-table-column label="操作" width="200" fixed="right" align="center">
           <template #default="{ row }">
             <el-button
@@ -162,7 +120,7 @@
       </el-table>
 
       <!-- Pagination -->
-      <div class="pagination-section">
+      <div class="flex justify-end mt-4">
         <el-pagination
           v-model:current-page="pagination.currentPage"
           v-model:page-size="pagination.pageSize"
@@ -178,17 +136,33 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, h } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
-  getProjectList,
-  updateTrafficCapture,
+  getProjects,
+  createProject,
   deleteProject,
-  type ProjectItem,
-  type SearchForm,
-  type Pagination
-} from "@/api/project-list";
-import { projectListColumns } from "./list-columns";
+  getProjectTypes,
+  type Project,
+  type ProjectType,
+  type CreateProjectRequest
+} from "@/api/projects";
+import { addDialog } from "@/components/ReDialog";
+import CreateProjectForm from "./components/create-project-form.vue";
+import { message } from "@/utils/message";
+
+// Type definitions
+interface SearchForm {
+  projectName: string;
+  productType: string;
+  status: string;
+}
+
+interface Pagination {
+  currentPage: number;
+  pageSize: number;
+  total: number;
+}
 
 // State
 const searchForm = reactive<SearchForm>({
@@ -197,8 +171,9 @@ const searchForm = reactive<SearchForm>({
   status: ""
 });
 
-const tableData = ref<ProjectItem[]>([]);
-const selectedRows = ref<ProjectItem[]>([]);
+const tableData = ref<Project[]>([]);
+const selectedRows = ref<Project[]>([]);
+const productTypes = ref<ProjectType[]>([]);
 
 const pagination = reactive<Pagination>({
   currentPage: 1,
@@ -209,16 +184,14 @@ const pagination = reactive<Pagination>({
 // Methods
 const loadTableData = async () => {
   try {
-    const response = await getProjectList({
-      projectName: searchForm.projectName,
-      productType: searchForm.productType,
-      status: searchForm.status,
-      currentPage: pagination.currentPage,
-      pageSize: pagination.pageSize
+    const response = await getProjects({
+      page: pagination.currentPage,
+      per_page: pagination.pageSize,
+      type: searchForm.productType || undefined
     });
 
     if (response.code === "200") {
-      tableData.value = response.data.data;
+      tableData.value = response.data.projects;
       pagination.total = response.data.pagination.total;
     }
   } catch (error) {
@@ -241,65 +214,84 @@ const handleReset = () => {
   ElMessage.info("已重置搜索条件");
 };
 
+const formRef = ref();
+
 const handleCreate = () => {
-  ElMessage.info("创建项目功能待实现");
-  // Navigate to create page or open dialog
+  addDialog({
+    title: "创建项目",
+    props: {
+      formInline: {
+        name: "",
+        description: "",
+        type: ""
+      },
+      productTypes: productTypes.value
+    },
+    width: "40%",
+    draggable: true,
+    closeOnClickModal: false,
+    contentRenderer: () => h(CreateProjectForm, { ref: formRef }),
+    beforeSure: async (done, { options }) => {
+      const FormRef = formRef.value.getRef();
+      const curData = options.props.formInline as CreateProjectRequest;
+
+      async function chores() {
+        try {
+          await createProject(curData);
+          ElMessage.success("创建项目成功");
+          loadTableData();
+          done(); // 关闭弹框
+        } catch (error) {
+          console.error("Failed to create project:", error);
+          ElMessage.error("创建项目失败");
+        }
+      }
+
+      FormRef.validate(async (valid: boolean) => {
+        if (valid) {
+          await chores();
+        }
+      });
+    }
+  });
 };
 
-const handleSelectionChange = (selection: ProjectItem[]) => {
+const handleSelectionChange = (selection: Project[]) => {
   selectedRows.value = selection;
 };
 
-const handleTrafficCaptureChange = async (row: ProjectItem) => {
-  try {
-    await updateTrafficCapture({
-      id: row.id,
-      trafficCapture: row.trafficCapture
-    });
-    ElMessage.success(
-      `已${row.trafficCapture ? "开启" : "关闭"}流量抓取: ${row.projectName}`
-    );
-  } catch (error) {
-    console.error("Failed to update traffic capture:", error);
-    ElMessage.error("更新流量抓取状态失败");
-    // Revert the change on error
-    row.trafficCapture = !row.trafficCapture;
-  }
-};
-
-const handleDetail = (row: ProjectItem) => {
-  ElMessage.info(`查看详情: ${row.projectName}`);
+const handleDetail = (row: Project) => {
+  ElMessage.info(`查看详情: ${row.name}`);
   // Navigate to detail page
 };
 
-const handleEdit = (row: ProjectItem) => {
-  ElMessage.info(`编辑项目: ${row.projectName}`);
+const handleEdit = (row: Project) => {
+  ElMessage.info(`编辑项目: ${row.name}`);
   // Navigate to edit page or open dialog
 };
 
-const handleDelete = async (row: ProjectItem) => {
+const handleDelete = async (row: Project) => {
   try {
-    await ElMessageBox.confirm(
-      `确定要删除项目 "${row.projectName}" 吗?`,
-      "确认删除",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }
-    );
+    await ElMessageBox.confirm(`确定要删除项目 "${row.name}" 吗?`, "确认删除", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    });
 
-    await deleteProject({ id: row.id });
-    ElMessage.success("删除成功");
+    await deleteProject(row._id);
+    message("删除成功");
     loadTableData();
   } catch (error) {
     if (error !== "cancel") {
       console.error("Failed to delete project:", error);
-      ElMessage.error("删除项目失败");
-    } else {
-      ElMessage.info("已取消删除");
+      message("删除项目失败", { type: "error" });
     }
   }
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("zh-CN");
 };
 
 const handleSizeChange = (size: number) => {
@@ -313,136 +305,22 @@ const handleCurrentChange = (page: number) => {
   loadTableData();
 };
 
+// Load product types
+const loadProductTypes = async () => {
+  try {
+    const response = await getProjectTypes();
+    if (response.code === "200") {
+      productTypes.value = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to load product types:", error);
+    ElMessage.error("加载产品类型失败");
+  }
+};
+
 // Lifecycle
 onMounted(() => {
   loadTableData();
+  loadProductTypes();
 });
 </script>
-
-<style scoped lang="scss">
-// Responsive
-@media (width <= 1199px) {
-  .search-section {
-    flex-direction: column;
-    align-items: flex-start;
-
-    .search-form {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-
-    .create-button {
-      margin-left: 0;
-    }
-  }
-}
-
-@media (width <= 767px) {
-  .project-list-page {
-    padding: 12px;
-  }
-
-  .header-section {
-    padding: 16px;
-  }
-
-  .search-section {
-    padding: 12px;
-
-    .search-form {
-      :deep(.el-form-item) {
-        display: block;
-        margin-bottom: 8px;
-
-        .el-input,
-        .el-select {
-          width: 100% !important;
-        }
-      }
-    }
-  }
-
-  .table-section {
-    overflow-x: auto;
-  }
-}
-
-.header-section {
-  padding: 24px;
-  margin-bottom: 16px;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  border-radius: 8px;
-
-  .page-title {
-    margin: 0 0 8px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #303133;
-  }
-
-  .page-subtitle {
-    margin: 0;
-    font-size: 14px;
-    color: #606266;
-  }
-}
-
-.search-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  margin-bottom: 16px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 5%);
-
-  .search-form {
-    flex: 1;
-    margin: 0;
-
-    :deep(.el-form-item) {
-      margin-bottom: 0;
-    }
-  }
-
-  .create-button {
-    margin-left: 12px;
-  }
-}
-
-.table-section {
-  padding: 16px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 5%);
-
-  :deep(.el-table) {
-    font-size: 14px;
-
-    .el-table__header-wrapper {
-      th {
-        font-weight: bold;
-        background-color: #f8f8f8;
-      }
-    }
-
-    .el-table__row {
-      &:hover {
-        background-color: #f5f7fa;
-      }
-    }
-
-    .cell {
-      padding: 12px;
-    }
-  }
-}
-
-.pagination-section {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-</style>

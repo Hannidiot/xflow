@@ -155,14 +155,9 @@
           <h3 class="text-lg font-bold text-gray-900">
             Vulnerability Comparison
           </h3>
-          <el-switch
-            v-model="showVulnerabilityDetails"
-            active-text="Show Details"
-            inactive-text="Hide Details"
-          />
         </div>
         <el-collapse-transition>
-          <div v-show="showVulnerabilityDetails">
+          <div>
             <DiffTable
               :data-group="[
                 comparisonResult.vulnerabilityDiff.projectA,
@@ -212,7 +207,6 @@ const selectedProjectB = ref<string>("");
 const projectOptions = ref<ProjectItem[]>([]);
 const comparisonResult = ref<ProjectComparisonResponse | null>(null);
 const loading = ref<boolean>(false);
-const showVulnerabilityDetails = ref<boolean>(true);
 
 // Computed
 const canCompare = computed(() => {

@@ -15,6 +15,7 @@
       :data-group="[data1, data2]"
       :columns="columns"
       unique-key="id"
+      class="space-x-2"
     />
   </div>
 </template>
