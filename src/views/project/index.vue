@@ -138,6 +138,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, h } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { useProjectDetail } from "./components/hooks";
 import {
   getProjects,
   createProject,
@@ -163,6 +164,9 @@ interface Pagination {
   pageSize: number;
   total: number;
 }
+
+// Multi-tab hook
+const { toProjectDetail } = useProjectDetail();
 
 // State
 const searchForm = reactive<SearchForm>({
@@ -261,12 +265,12 @@ const handleSelectionChange = (selection: Project[]) => {
 };
 
 const handleDetail = (row: Project) => {
-  ElMessage.info(`查看详情: ${row.name}`);
-  // Navigate to detail page
+  // Navigate to detail page with projectId using multi-tab
+  toProjectDetail({ projectId: row._id });
 };
 
 const handleEdit = (row: Project) => {
-  ElMessage.info(`编辑项目: ${row.name}`);
+  message(`编辑项目: ${row.name}`);
   // Navigate to edit page or open dialog
 };
 

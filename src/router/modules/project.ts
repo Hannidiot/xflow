@@ -14,7 +14,7 @@ export default {
     {
       path: "/project/list",
       name: "ProjectList",
-      component: () => import("@/views/project/list.vue"),
+      component: () => import("@/views/project/index.vue"),
       meta: {
         title: "项目管理",
         showLink: true
@@ -32,7 +32,7 @@ export default {
     {
       path: "/project/info",
       name: "ProjectInfo",
-      component: () => import("@/views/project/index.vue"),
+      component: () => import("@/views/project/info-tab/index.vue"),
       meta: {
         title: "项目信息",
         showLink: true
@@ -46,6 +46,15 @@ export default {
       meta: {
         title: "项目配置",
         showLink: true
+      }
+    },
+    {
+      path: "/project/detail",
+      name: "ProjectDetail",
+      component: () => import("@/views/project/detail.vue"),
+      meta: {
+        title: "Project Detail",
+        showLink: false // Hidden from menus
       }
     }
   ]

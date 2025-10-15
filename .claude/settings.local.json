@@ -8,7 +8,8 @@
       "Bash(pnpm list)",
       "Bash(pnpm add:*)",
       "Bash(mkdir:*)",
-      "Bash(pnpm dev)"
+      "Bash(pnpm dev)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
