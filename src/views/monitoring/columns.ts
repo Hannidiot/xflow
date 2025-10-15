@@ -1,4 +1,4 @@
-import type { TableColumn } from "@/views/project/columns";
+import type { TableColumn } from "@/views/project/info-tab/columns";
 
 export const monitoringTableColumns: TableColumn[] = [
   {

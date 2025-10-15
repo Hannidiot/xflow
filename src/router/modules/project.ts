@@ -23,7 +23,7 @@ export default {
     {
       path: "/project/comparison",
       name: "ProjectComparison",
-      component: () => import("@/views/project/comparison.vue"),
+      component: () => import("@/views/project/comparison-tab/comparison.vue"),
       meta: {
         title: "项目对比",
         showLink: true
@@ -41,7 +41,8 @@ export default {
     {
       path: "/project/configuration",
       name: "ProjectConfiguration",
-      component: () => import("@/views/project/configuration.vue"),
+      component: () =>
+        import("@/views/project/configuration-tab/configuration.vue"),
       meta: {
         title: "项目配置",
         showLink: true

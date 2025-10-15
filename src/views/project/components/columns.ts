@@ -1,4 +1,4 @@
-import type { TableColumn } from "./columns";
+import type { TableColumn } from "../info-tab/columns";
 
 export const projectListColumns: TableColumn[] = [
   {

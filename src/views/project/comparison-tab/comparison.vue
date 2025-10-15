@@ -198,7 +198,7 @@ import {
   type DiffType
 } from "@/api/project-comparison";
 import type { ProjectItem } from "@/api/project-list";
-import { apiDiffColumns, vulnerabilityDiffColumns } from "./comparison-columns";
+import { apiDiffColumns, vulnerabilityDiffColumns } from "./columns";
 import { DiffTable } from "@/components/DiffTable";
 
 // State

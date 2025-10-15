@@ -1,289 +1,326 @@
 <template>
-  <div class="h-full flex flex-col">
-    <!-- Main Content with Splitter -->
-    <div class="flex-1">
-      <!-- Project Information Block -->
-      <div
-        class="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-      >
-        <div class="space-y-6">
-          <!-- Header -->
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Project Dashboard
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">
-              Monitor your project metrics and API performance
-            </p>
-          </div>
+  <div class="h-full">
+    <!-- Header Section -->
+    <div class="bg-white p-6 mb-4 border-b border-gray-200 rounded-lg">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">项目管理</h1>
+      <p class="text-sm text-gray-600">管理和监控您的流量分析项目</p>
+    </div>
 
-          <!-- Project Metadata -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Project Name -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Project Name
-              </label>
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ projectInfo.name }}
-              </div>
-            </div>
-
-            <!-- Disk Usage -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Disk Usage
-              </label>
-              <div class="flex items-center space-x-3">
-                <el-progress
-                  :percentage="diskUsage.percentage"
-                  :color="diskUsage.color"
-                  :show-text="false"
-                  class="flex-1"
-                />
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ diskUsage.used }} / {{ diskUsage.total }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Status -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Status
-              </label>
-              <el-tag
-                :type="projectInfo.status === 'Active' ? 'success' : 'warning'"
-                size="large"
-              >
-                {{ projectInfo.status }}
-              </el-tag>
-            </div>
-
-            <!-- Created Date -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Created Date
-              </label>
-              <div class="text-gray-900 dark:text-white">
-                {{ formatDate(projectInfo.createdAt) }}
-              </div>
-            </div>
-
-            <!-- Last Updated -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Last Updated
-              </label>
-              <div class="text-gray-900 dark:text-white">
-                {{ formatDate(projectInfo.updatedAt) }}
-              </div>
-            </div>
-
-            <!-- API Count -->
-            <div class="space-y-2">
-              <label
-                class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Total APIs
-              </label>
-              <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {{ apiList.length }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Project Description -->
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Description
-            </label>
-            <div
-              class="text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
-            >
-              {{ projectInfo.description }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- API List Block -->
-      <div>
-        <VxeTableBar
-          :vxeTableRef="vxeTableRef"
-          :columns="tableColumns"
-          title="API List"
-          @refresh="handleRefresh"
-        >
-          <template #default="{ size, dynamicColumns }">
-            <vxe-grid
-              ref="vxeTableRef"
-              show-overflow
-              :height="tableHeight"
-              :size="size"
-              :column-config="{ resizable: true }"
-              :scroll-y="{ enabled: true }"
-              :columns="dynamicColumns"
-              :data="apiList"
+    <!-- Search/Filter Section -->
+    <div
+      class="bg-white p-6 mb-4 rounded-lg shadow-sm flex items-center justify-between"
+    >
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item class="min-w-[150px]">
+          <el-input
+            v-model="searchForm.projectName"
+            placeholder="请输入项目名称"
+            clearable
+          />
+        </el-form-item>
+        <el-form-item class="min-w-[150px]">
+          <el-select
+            v-model="searchForm.productType"
+            placeholder="请选择产品"
+            clearable
+          >
+            <el-option
+              v-for="type in productTypes"
+              :key="type._id"
+              :label="type.name"
+              :value="type.code"
             />
+          </el-select>
+        </el-form-item>
+        <el-form-item class="min-w-[150px]">
+          <el-select
+            v-model="searchForm.status"
+            placeholder="请选择状态"
+            clearable
+          >
+            <el-option label="活跃" value="active" />
+            <el-option label="非活跃" value="inactive" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">搜索</el-button>
+          <el-button @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+      <div class="ml-3">
+        <el-button type="primary" @click="handleCreate">
+          <el-icon><Plus /></el-icon>
+          创建项目
+        </el-button>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white p-4 rounded-lg shadow-sm">
+      <el-table
+        :data="tableData"
+        class="w-full text-sm"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column prop="name" label="项目名称" width="180">
+          <template #default="{ row }">
+            <el-link type="primary" @click="handleDetail(row)">
+              {{ row.name }}
+            </el-link>
           </template>
-        </VxeTableBar>
+        </el-table-column>
+        <el-table-column label="状态标签" width="100" align="center">
+          <template>
+            <el-tag type="success"> 活跃 </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="产品类型" width="120">
+          <template #default="{ row }">
+            {{ row.type || "未设置" }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="description" label="描述" min-width="150" />
+        <el-table-column label="更新时间" width="120">
+          <template #default="{ row }">
+            {{ formatDate(row.updated_at) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200" fixed="right" align="center">
+          <template #default="{ row }">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click="handleDetail(row)"
+            >
+              <el-icon><View /></el-icon>
+              详情
+            </el-button>
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click="handleEdit(row)"
+            >
+              <el-icon><Edit /></el-icon>
+              编辑
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              size="small"
+              @click="handleDelete(row)"
+            >
+              <el-icon><Delete /></el-icon>
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- Pagination -->
+      <div class="flex justify-end mt-4">
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
-import { VxeTableBar } from "@/components/ReVxeTableBar";
+<script lang="ts" setup>
+import { ref, reactive, onMounted, h } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
-  getProjectInfo,
-  getProjectDiskUsage,
-  getProjectApiList,
-  type ProjectInfo,
-  type DiskUsage,
-  type ApiItem
-} from "@/api/project";
-import { apiTableColumns } from "./columns";
+  getProjects,
+  createProject,
+  deleteProject,
+  getProjectTypes,
+  type Project,
+  type ProjectType,
+  type CreateProjectRequest
+} from "@/api/projects";
+import { addDialog } from "@/components/ReDialog";
+import CreateProjectForm from "./components/create-project-form.vue";
+import { message } from "@/utils/message";
 
-export default defineComponent({
-  name: "ProjectInfo",
-  components: {
-    VxeTableBar
-  },
-  props: {
-    projectId: {
-      type: String,
-      required: true
+// Type definitions
+interface SearchForm {
+  projectName: string;
+  productType: string;
+  status: string;
+}
+
+interface Pagination {
+  currentPage: number;
+  pageSize: number;
+  total: number;
+}
+
+// State
+const searchForm = reactive<SearchForm>({
+  projectName: "",
+  productType: "",
+  status: ""
+});
+
+const tableData = ref<Project[]>([]);
+const selectedRows = ref<Project[]>([]);
+const productTypes = ref<ProjectType[]>([]);
+
+const pagination = reactive<Pagination>({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0
+});
+
+// Methods
+const loadTableData = async () => {
+  try {
+    const response = await getProjects({
+      page: pagination.currentPage,
+      per_page: pagination.pageSize,
+      type: searchForm.productType || undefined
+    });
+
+    if (response.code === "200") {
+      tableData.value = response.data.projects;
+      pagination.total = response.data.pagination.total;
     }
-  },
-  setup(props) {
-    // State
-    const vxeTableRef = ref();
-    const projectInfo = ref<ProjectInfo>({
-      name: "",
-      description: "",
-      status: "",
-      createdAt: "",
-      updatedAt: ""
-    });
-
-    const diskUsage = ref<DiskUsage>({
-      used: "",
-      total: "",
-      percentage: 0,
-      color: "#409EFF"
-    });
-
-    const apiList = ref<ApiItem[]>([]);
-
-    // Table columns
-    const tableColumns = ref(apiTableColumns);
-
-    // Computed
-    const tableHeight = computed(() => {
-      return window.innerHeight - 500;
-    });
-
-    // Methods
-    const handleRefresh = () => {
-      loadAllData();
-    };
-
-    const formatDate = (dateString: string): string => {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
-    };
-
-    const loadProjectInfo = async () => {
-      try {
-        const response = await getProjectInfo({ projectId: props.projectId });
-        if (response.code === "200") {
-          projectInfo.value = response.data;
-        }
-      } catch (error) {
-        console.error("Failed to load project info:", error);
-      }
-    };
-
-    const loadDiskUsage = async () => {
-      try {
-        const response = await getProjectDiskUsage({
-          projectId: props.projectId
-        });
-        if (response.code === "200") {
-          diskUsage.value = response.data;
-        }
-      } catch (error) {
-        console.error("Failed to load disk usage:", error);
-      }
-    };
-
-    const loadApiList = async () => {
-      try {
-        const response = await getProjectApiList({
-          projectId: props.projectId
-        });
-        if (response.code === "200") {
-          apiList.value = response.data;
-        }
-      } catch (error) {
-        console.error("Failed to load API list:", error);
-      }
-    };
-
-    const loadAllData = async () => {
-      await Promise.all([loadProjectInfo(), loadDiskUsage(), loadApiList()]);
-    };
-
-    // Lifecycle
-    onMounted(() => {
-      loadAllData();
-    });
-
-    return {
-      vxeTableRef,
-      projectInfo,
-      diskUsage,
-      apiList,
-      tableColumns,
-      tableHeight,
-      handleRefresh,
-      formatDate
-    };
+  } catch (error) {
+    console.error("Failed to load project list:", error);
+    ElMessage.error("加载项目列表失败");
   }
+};
+
+const handleSearch = () => {
+  pagination.currentPage = 1;
+  loadTableData();
+};
+
+const handleReset = () => {
+  searchForm.projectName = "";
+  searchForm.productType = "";
+  searchForm.status = "";
+  pagination.currentPage = 1;
+  loadTableData();
+  ElMessage.info("已重置搜索条件");
+};
+
+const formRef = ref();
+
+const handleCreate = () => {
+  addDialog({
+    title: "创建项目",
+    props: {
+      formInline: {
+        name: "",
+        description: "",
+        type: ""
+      },
+      productTypes: productTypes.value
+    },
+    width: "40%",
+    draggable: true,
+    closeOnClickModal: false,
+    contentRenderer: () => h(CreateProjectForm, { ref: formRef }),
+    beforeSure: async (done, { options }) => {
+      const FormRef = formRef.value.getRef();
+      const curData = options.props.formInline as CreateProjectRequest;
+
+      async function chores() {
+        try {
+          await createProject(curData);
+          ElMessage.success("创建项目成功");
+          loadTableData();
+          done(); // 关闭弹框
+        } catch (error) {
+          console.error("Failed to create project:", error);
+          ElMessage.error("创建项目失败");
+        }
+      }
+
+      FormRef.validate(async (valid: boolean) => {
+        if (valid) {
+          await chores();
+        }
+      });
+    }
+  });
+};
+
+const handleSelectionChange = (selection: Project[]) => {
+  selectedRows.value = selection;
+};
+
+const handleDetail = (row: Project) => {
+  ElMessage.info(`查看详情: ${row.name}`);
+  // Navigate to detail page
+};
+
+const handleEdit = (row: Project) => {
+  ElMessage.info(`编辑项目: ${row.name}`);
+  // Navigate to edit page or open dialog
+};
+
+const handleDelete = async (row: Project) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除项目 "${row.name}" 吗?`, "确认删除", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    });
+
+    await deleteProject(row._id);
+    message("删除成功");
+    loadTableData();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("Failed to delete project:", error);
+      message("删除项目失败", { type: "error" });
+    }
+  }
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("zh-CN");
+};
+
+const handleSizeChange = (size: number) => {
+  pagination.pageSize = size;
+  pagination.currentPage = 1;
+  loadTableData();
+};
+
+const handleCurrentChange = (page: number) => {
+  pagination.currentPage = page;
+  loadTableData();
+};
+
+// Load product types
+const loadProductTypes = async () => {
+  try {
+    const response = await getProjectTypes();
+    if (response.code === "200") {
+      productTypes.value = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to load product types:", error);
+    ElMessage.error("加载产品类型失败");
+  }
+};
+
+// Lifecycle
+onMounted(() => {
+  loadTableData();
+  loadProductTypes();
 });
 </script>
-
-<style scoped>
-:deep(.el-split__trigger) {
-  background-color: rgb(229 231 235);
-}
-
-:deep(.el-split__trigger:hover) {
-  background-color: rgb(209 213 219);
-}
-
-@media (prefers-color-scheme: dark) {
-  :deep(.el-split__trigger) {
-    background-color: rgb(55 65 81);
-  }
-
-  :deep(.el-split__trigger:hover) {
-    background-color: rgb(75 85 99);
-  }
-}
-</style>
