@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex flex-col">
+  <div>
     <!-- Search Bar Section -->
     <div class="p-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-4">
@@ -31,9 +31,9 @@
       </div>
     </div>
 
-    <div class="flex flex-col flex-1 space-y-1">
+    <div class="h-[80vh] grid grid-cols-2 grid-rows-5 gap-1">
       <!-- Main Content -->
-      <div class="basis-3/5">
+      <div class="col-span-2 row-span-3">
         <vxe-grid
           ref="vxeTableRef"
           show-overflow
@@ -47,7 +47,7 @@
         />
       </div>
 
-      <div class="basis-2/5 flex flex-row space-x-1 min-h-auto">
+      <div class="col-span-2 row-span-2 flex flex-row space-x-1">
         <DetailPanel
           title="Request Details"
           :data="selectedRow?.request"
@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, reactive } from "vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
 import { Search as SearchIcon } from "@element-plus/icons-vue";
 import DetailPanel from "./components/DetailPanel.vue";
 import { getTrafficRecords, type TrafficRecord } from "@/api/monitoring";
@@ -158,13 +158,6 @@ export default defineComponent({
         JSON.stringify(newValue)
       );
       selectedRow.value = newValue;
-    };
-
-    // VXE Table row class handling
-    const getRowClass = ({ row }: { row: TrafficRecord }) => {
-      return selectedRow.value?.id === row.id
-        ? "selected-row bg-blue-50 dark:bg-blue-900"
-        : "";
     };
 
     const getMethodClass = (method: string) => {
